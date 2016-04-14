@@ -1,3 +1,5 @@
+import requests
+import json
 from zeroconf import *
 import socket
 
@@ -18,7 +20,9 @@ class ServiceListener(object):
         if info:
             ipaddrs = socket.inet_ntoa(info.getAddress())
             portaddr = info.getPort()
+            enodeurl = self.curl_url()
             print "  Address is %s:%d" % (ipaddrs, portaddr)
+            print "enode url %s" % (enodeurl)
             print "  Weight is %d, Priority is %d" % (info.getWeight(), info.getPriority())
             print "  Server is", info.getServer()
             prop = info.getProperties()

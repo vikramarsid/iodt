@@ -1,8 +1,11 @@
 import time
 import subprocess
+import os
+
+from gethup import Gethup
 from zeroconf import *
 from dynamic_discovery import ServiceListener
-from host_connection import HostConnect
+current_path = os.path.dirname(os.path.realpath(__file__))
 
 
 class DynamicDiscoveryDriver(object):
@@ -13,25 +16,27 @@ class DynamicDiscoveryDriver(object):
         time.sleep(40)
         Zeroconf().close()
 
-    def start_multichain_server(self):
+
+    def start_blockchain_server(self):
             p = subprocess.Popen(["ps", "-a"], stdout=subprocess.PIPE)
             out, err = p.communicate()
-            if 'multichaind' in out:
-                print('multichaind already running')
+            if 'geth' in out:
+                print('Ethereum client is already running')
             else:
-                serv = subprocess.Popen(["multichaind", "iodt-node01"], stdout=subprocess.PIPE)
+                serv = subprocess.Popen(['bash', 'gethup.sh'], stdout=subprocess.PIPE).wait()
                 output, error = serv.communicate()
                 print (output)
 
 
 if __name__ == '__main__':
 
-    scanner = DynamicDiscoveryDriver()
-    connector = HostConnect()
+    #scanner = DynamicDiscoveryDriver()
+    #connector = HostConnect()
+    #scanner.start_blockchain_server()
+    #scanner.scan()
+    #server = connector.connect()
+    #print (server.getinfo())
+    #print current_path
 
-    #scanner.start_multichain_server()
-
-    scanner.scan()
-
-    server = connector.connect()
-    print (server.getinfo())
+    startup = Gethup()
+    startup.startnode()
