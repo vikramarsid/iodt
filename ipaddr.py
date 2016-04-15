@@ -1,11 +1,12 @@
 import re
+import requests
 import  subprocess
 from multiprocessing.pool import ThreadPool
 
-import requests
-
 from flask import json
+
 from config_map import ConfigMap
+
 config = ConfigMap()
 
 pool = ThreadPool(processes=1)
@@ -53,10 +54,15 @@ class test(object):
 
 
 if __name__ == '__main__':
-
-    exe = test()
+    # exe = test()
     #print "device_id: " + config.ConfigSectionMap("instance")['id']
     #print "device_name: " + config.ConfigSectionMap("device")['name']
 
-    ff = exe.execute('geth --identity "iodtg-node01" --genesis /home/ubuntu/Desktop/iodt_genesis.json --rpc --rpcport "8080" --rpccorsdomain "*" --datadir "/home/ubuntu/iodt01" --port "30301" --nodiscover --rpcapi "admin,db,eth,net,web3" --networkid 2007',param="IPC service started")
-    print "============================\n" + str(ff["found"]) + "============================\n" + str(ff["ret"]) + "============================\n" + str(ff["val"])
+    # ff = exe.execute('geth --identity "iodtg-node01" --genesis /home/ubuntu/Desktop/iodt_genesis.json --rpc --rpcport "8080" --rpccorsdomain "*" --datadir "/home/ubuntu/iodt01" --port "30301" --nodiscover --rpcapi "admin,db,eth,net,web3" --networkid 2007',param="IPC service started")
+    # print "============================\n" + str(ff["found"]) + "============================\n" + str(ff["ret"]) + "============================\n" + str(ff["val"])
+
+
+    payload = {'enode': 'self.enodeid', 'host': 'self.get_ip_address()', 'rpcport': 'self.rpcport', 'port': 'self.port',
+               'dev-id': 'self.device_id', 'dev-name': 'self.device_name', 'id': 'str(randint(0, 1000))'}
+
+    print json.dumps(payload)

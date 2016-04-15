@@ -1,16 +1,17 @@
-import os
-import errno
-import re
-import subprocess
-import socket
-from shutil import copyfile
-from os.path import expanduser
-import time
 import datetime
+import errno
+import os
+import re
 import requests
-from flask import json
-from random import randint
+import socket
+import subprocess
+import time
 from multiprocessing.pool import ThreadPool
+from os.path import expanduser
+from random import randint
+from shutil import *
+
+from flask import json
 
 from config_map import ConfigMap
 
@@ -47,16 +48,11 @@ class Gethup(object):
 
     def ext_curl(self):
         url = "http://iodt.herokuapp.com/api/bootdevices"
-        payload = '{' \
-                  '\"enode\": \"' + self.enodeid + \
-                  '\",\"host\": \"' + self.get_ip_address() + \
-                  '\",\"rpcport\": \"' + self.rpcport + \
-                  '\",\"port\": \"' + self.port + \
-                  '\",\"dev-id\": \"' + self.device_id + \
-                  '\",\"dev-name\": \"' + self.device_name + \
-                  '\",\"id\": ' + randint(0, 1000) + \
-                  '}'
-        r = requests.post(url, data=payload)
+        payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
+                   'dev-id': self.device_id, 'dev-name': self.device_name, 'id': str(randint(0, 1000))}
+
+        headers = {'Content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
             print "Global Call: " + r.text
         return r.text
@@ -78,7 +74,7 @@ class Gethup(object):
         print "---executing command : " + cmd
         found = ''
         stdout = []
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.Popen(cmd, shell=True, executable='/bin/bash', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while True:
             line = p.stdout.readline()
             stdout.append(line)
@@ -87,7 +83,7 @@ class Gethup(object):
                 m = re.search(param, line)
                 if m:
                     found = m.string[m.string.find(param):len(m.string)]
-                    async_result = pool.apply_async(self.curl_url(found))
+                    async_result = pool.apply_async(self.local_curl(found))
             print line
 
             if line == '' and p.poll() != None:
@@ -105,6 +101,18 @@ class Gethup(object):
                 print "---Directory create--- " + path
         except OSError as exc:
             if exc.errno == errno.EEXIST and os.path.isdir(path):
+                pass
+            else:
+                raise
+
+    def copy(self, src, dst):
+
+        try:
+            print "---Copying--- \n" + src + " to " + dst
+            copytree(src, dst)
+
+        except OSError as exc:
+            if exc.errno == errno.EEXIST:
                 pass
             else:
                 raise
@@ -128,10 +136,10 @@ class Gethup(object):
 
         # bash commands
         geth_cmd = 'geth' + \
-                   ' --identity ' + self.device_name + \
-                   ' --networkid ' + network_id + \
+                   ' --identity "' + self.device_name + '"' \
+                                                        ' --networkid ' + network_id + \
                    ' --genesis ./genesis.json' + \
-                   ' --datadir' + datadir + \
+                   ' --datadir ' + datadir + \
                    ' --rpc' + \
                    ' --rpcport ' + rpcport + \
                    ' --rpccorsdomain "*"' + \
@@ -154,19 +162,26 @@ class Gethup(object):
         self.mkdir(directory)
         self.mkdir(directory + '/data/')
         self.mkdir(directory + '/log/')
-        os.symlink(log, linklog)
+        try:
+
+            os.symlink(log, linklog)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST:
+                pass
+            else:
+                raise
 
         # create ethereum account if not created
         if not os.path.exists(keystore):
             self.mkdir(keystore)
-            acc_status = self.execute(create_acc)
-            if acc_status["ret"] == 0:
-                print "Copying keystore"
-                copyfile(datadir + '/keystore', keystore)
+        acc_status = self.execute(str(create_acc))
+        if acc_status["ret"] == 0:
+            print "Copying keystore"
+            self.copy(datadir + '/keystore', keystore)
 
         if not os.path.exists(datadir + '/keystore'):
             print "Copying keys"
-            copyfile(keystore + '/keystore', datadir + '/keystore')
+            self.copy(keystore + '/keystore', datadir + '/keystore')
 
         account_no = self.execute(account_cmd)
         print "account_no-----\n" + str(account_no["val"])
