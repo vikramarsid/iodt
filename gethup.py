@@ -38,6 +38,7 @@ class Gethup(object):
     rpcport = '82' + instance_id
     network_id = '9030'
     enodeid = ''
+    accno = ''
 
     def get_ip_address(self):
         gw = os.popen("ip -4 route show default").read().split()
@@ -47,9 +48,11 @@ class Gethup(object):
         return ipaddr
 
     def ext_curl(self):
+        # url = "http://192.168.29.154:7000/api/devices"
         url = "http://iodt.herokuapp.com/api/bootdevices"
         payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
-                   'dev-id': self.device_id, 'dev-name': self.device_name, 'id': str(randint(0, 1000))}
+                   'device_id': self.device_id, 'account': self.accno, 'name': self.device_name,
+                   'id': str(randint(0, 1000))}
 
         headers = {'Content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
@@ -117,6 +120,26 @@ class Gethup(object):
             else:
                 raise
 
+    def givegeth(self, curaccno):
+        geth_cmd = 'geth' + \
+                   ' --identity "' + self.device_name + '"' \
+                                                        ' --networkid ' + self.network_id + \
+                   ' --genesis ./genesis.json' + \
+                   ' --datadir ' + self.datadir + \
+                   ' --unlock ' + curaccno + \
+                   ' --password <(echo -n ' + self.instance_id + ')' + \
+                   ' --rpc' + \
+                   ' --rpcport ' + self.rpcport + \
+                   ' --rpccorsdomain "*"' + \
+                   ' --rpcapi "admin,db,eth,net,web3"' + \
+                   ' --nodiscover' + \
+                   ' --mine' + \
+                   ' --minerthreads 1' + \
+                   ' --fast' + \
+                   ' --shh' + \
+                   ' --lightkdf'
+        return geth_cmd
+
     def startnode(self):
 
         # start up initials
@@ -135,19 +158,6 @@ class Gethup(object):
         network_id = self.network_id
 
         # bash commands
-        geth_cmd = 'geth' + \
-                   ' --identity "' + self.device_name + '"' \
-                                                        ' --networkid ' + network_id + \
-                   ' --genesis ./genesis.json' + \
-                   ' --datadir ' + datadir + \
-                   ' --rpc' + \
-                   ' --rpcport ' + rpcport + \
-                   ' --rpccorsdomain "*"' + \
-                   ' --rpcapi "admin,db,eth,net,web3"' + \
-                   ' --nodiscover' + \
-                   ' --fast' + \
-                   ' --shh' + \
-                   ' --lightkdf'
 
         account_cmd = 'geth' + \
                       ' --datadir=' + datadir + \
@@ -184,7 +194,13 @@ class Gethup(object):
             self.copy(keystore + '/keystore', datadir + '/keystore')
 
         account_no = self.execute(account_cmd)
-        print "account_no-----\n" + str(account_no["val"])
+        logno = str(account_no["val"])
+        temp = logno.find("{")
+        self.accno = logno[logno.find("{") + 1:logno.find("}")]
+        print "account_no-----\n" + self.accno
 
-        final_run = self.execute(geth_cmd,param="IPC service started")
-        print "geth-----\n" + str(final_run["val"])
+        if self.accno != '':
+            print self.accno
+            geth_command = self.givegeth(self.accno)
+            final_run = self.execute(geth_command, param="IPC endpoint opened")
+            print "geth-----\n" + str(final_run["val"])
