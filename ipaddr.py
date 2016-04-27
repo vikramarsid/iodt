@@ -3,6 +3,7 @@ import requests
 import  subprocess
 from multiprocessing.pool import ThreadPool
 
+from eth_ipc_client import Client
 from flask import json
 
 from config_map import ConfigMap
@@ -10,6 +11,9 @@ from config_map import ConfigMap
 config = ConfigMap()
 
 pool = ThreadPool(processes=1)
+
+client = Client("/home/ubuntu/iodt-node/data/03/geth.ipc")
+
 
 class test(object):
 
@@ -54,15 +58,5 @@ class test(object):
 
 
 if __name__ == '__main__':
-    # exe = test()
-    #print "device_id: " + config.ConfigSectionMap("instance")['id']
-    #print "device_name: " + config.ConfigSectionMap("device")['name']
-
-    # ff = exe.execute('geth --identity "iodtg-node01" --genesis /home/ubuntu/Desktop/iodt_genesis.json --rpc --rpcport "8080" --rpccorsdomain "*" --datadir "/home/ubuntu/iodt01" --port "30301" --nodiscover --rpcapi "admin,db,eth,net,web3" --networkid 2007',param="IPC service started")
-    # print "============================\n" + str(ff["found"]) + "============================\n" + str(ff["ret"]) + "============================\n" + str(ff["val"])
-
-
-    payload = {'enode': 'self.enodeid', 'host': 'self.get_ip_address()', 'rpcport': 'self.rpcport', 'port': 'self.port',
-               'dev-id': 'self.device_id', 'dev-name': 'self.device_name', 'id': 'str(randint(0, 1000))'}
-
-    print json.dumps(payload)
+    exe = test()
+    print client.get_code("0x073ac9308d886fc2439ef04e28fc352b5e2f17ee", block="latest")

@@ -24,6 +24,7 @@ class Gethup(object):
     device_id = config.ConfigSectionMap("device")['id']
     device_name = config.ConfigSectionMap("device")['name']
     instance_id = config.ConfigSectionMap("instance")['id']
+    server_url = config.ConfigSectionMap("server")['dev-url']
     directory = expanduser("~") + "/iodt-node"
 
     # geth CLI params
@@ -48,10 +49,10 @@ class Gethup(object):
         return ipaddr
 
     def ext_curl(self):
-        # url = "http://192.168.29.154:7000/api/devices"
-        url = "http://iodt.herokuapp.com/api/bootdevices"
+        url = self.server_url
         payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
                    'device_id': self.device_id, 'account': self.accno, 'name': self.device_name,
+                   'network_id': self.network_id,
                    'id': str(randint(0, 1000))}
 
         headers = {'Content-type': 'application/json'}
@@ -129,15 +130,18 @@ class Gethup(object):
                    ' --unlock ' + curaccno + \
                    ' --password <(echo -n ' + self.instance_id + ')' + \
                    ' --rpc' + \
+                   ' --rpcaddr 0.0.0.0' + \
                    ' --rpcport ' + self.rpcport + \
                    ' --rpccorsdomain "*"' + \
-                   ' --rpcapi "admin,db,eth,net,web3"' + \
+                   ' --rpcapi "admin,db,eth,net,web3,shh"' + \
                    ' --nodiscover' + \
                    ' --mine' + \
                    ' --minerthreads 1' + \
                    ' --fast' + \
                    ' --shh' + \
-                   ' --lightkdf'
+                   ' --lightkdf' + \
+                   ' js ./mine.js'
+
         return geth_cmd
 
     def startnode(self):
