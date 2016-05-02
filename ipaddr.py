@@ -2,18 +2,19 @@ import re
 import requests
 import  subprocess
 from multiprocessing.pool import ThreadPool
+from os.path import expanduser
 
-from eth_ipc_client import Client
 from flask import json
+from web3 import Web3, IPCProvider
 
 from config_map import ConfigMap
 
 config = ConfigMap()
-
 pool = ThreadPool(processes=1)
-
-client = Client("/home/ubuntu/iodt-node/data/03/geth.ipc")
-
+ipcpath = expanduser("~") + "/iodt-node" + '/data/' + config.config_section_map("instance")['id'] + '/geth.ipc'
+web3 = Web3(IPCProvider(ipcpath, testnet=False))
+web3.config.defaultAccount = config.config_section_map("instance")["account"]
+web3.config.defaultBlock = "latest"
 
 class test(object):
 
@@ -29,6 +30,8 @@ class test(object):
             print "------------------" + d["result"]["enode"]
         return enode_url
 
+    def show(self, res):
+        print res
 
 
     def execute(self,cmd, *args, **kwargs):
@@ -59,6 +62,12 @@ class test(object):
 
 if __name__ == '__main__':
     exe = test()
+    # myIdentity = web3.shh.newIdentity()
+    # r = web3.shh.filter({"topic":["0x68656c6c6f20776f726c64"]})
+    # q = web3.shh.post({"topics": "power_msg","payload": "Hi this is test message","priority": "0x64","ttl": "0x64"})
+    # print r
+    # print q
+    print web3.shh.getFilterChanges("0x7")
     # print client.get_code("0x4130774716a6ad06af7cbe5585b5139710135efc", block="latest")
-    print client.get_transaction_by_hash("0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
-    print client.get_block_by_number("0x38f388fadf4a6a35c61c3f88194ec5ae162c8944")
+    # print client.get_transaction_by_hash("0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+    #print client.get_block_by_number("0x38f388fadf4a6a35c61c3f88194ec5ae162c8944")

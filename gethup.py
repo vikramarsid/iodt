@@ -13,18 +13,19 @@ from shutil import *
 
 from flask import json
 
+import web3_connect
 from config_map import ConfigMap
 
 config = ConfigMap()
 pool = ThreadPool(processes=1)
-
+set_web3 = web3_connect.Web3Connect()
 
 class Gethup(object):
     # start up initials
-    device_id = config.ConfigSectionMap("device")['id']
-    device_name = config.ConfigSectionMap("device")['name']
-    instance_id = config.ConfigSectionMap("instance")['id']
-    server_url = config.ConfigSectionMap("server")['dev-url']
+    device_id = config.config_section_map("device")['id']
+    device_name = config.config_section_map("device")['name']
+    instance_id = config.config_section_map("instance")['id']
+    server_url = config.config_section_map("server")['dev-url']
     directory = expanduser("~") + "/iodt-node"
 
     # geth CLI params
@@ -50,18 +51,21 @@ class Gethup(object):
 
     def ext_curl(self):
         url = self.server_url
+        shh_id = set_web3.set_identity()  # setting shh_id
         payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
                    'device_id': self.device_id, 'account': self.accno, 'name': self.device_name,
-                   'network_id': self.network_id,
+                   'network_id': self.network_id, 'shh_id': shh_id,
                    'id': str(randint(0, 1000))}
 
         headers = {'Content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
             print "Global Call: " + r.text
+            config.write_power_profile("50", "1")  # setting powerlimit and priority
         return r.text
 
     def local_curl(self, strs):
+        config.write_config("instance", "account", self.accno)
         localURL = "http://localhost:" + self.rpcport
         payload = '{"jsonrpc": "2.0", "method": "admin_nodeInfo", "params": [], "id": 74}'
         r = requests.post(localURL, data=payload)
@@ -206,5 +210,6 @@ class Gethup(object):
         if self.accno != '':
             print self.accno
             geth_command = self.givegeth(self.accno)
-            final_run = self.execute(geth_command, param="IPC service started")
+            # final_run = self.execute(geth_command, param="IPC service started")
+            final_run = self.execute(geth_command, param="IPC endpoint opened")
             print "geth-----\n" + str(final_run["val"])
