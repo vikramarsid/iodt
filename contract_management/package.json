@@ -1,0 +1,17 @@
+{
+  "name": "contract_management",
+  "description": "IoDT contract management",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./truffle.js",
+  "directories": {
+    "contracts": "./contracts"
+  },
+  "dependencies": {
+    "fs": "*",
+    "ini": "*",
+    "web3": "0.15.3",
+    "ws": "^1.0.1"
+  },
+  "license": "LGPL-3.0"
+}

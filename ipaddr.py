@@ -59,4 +59,6 @@ class test(object):
 
 if __name__ == '__main__':
     exe = test()
-    print client.get_code("0x073ac9308d886fc2439ef04e28fc352b5e2f17ee", block="latest")
+    # print client.get_code("0x4130774716a6ad06af7cbe5585b5139710135efc", block="latest")
+    print client.get_transaction_by_hash("0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+    print client.get_block_by_number("0x38f388fadf4a6a35c61c3f88194ec5ae162c8944")

@@ -60,17 +60,6 @@ function echo_if {
 
 # ============================================== Functions
 
-  if [ $(program_is_installed ethereum) == 1 ]; then
-    echo_pass "Ethereum"
-  else
-    echo "===============Installing Ethereum================="
-    apt-get install software-properties-common
-    add-apt-repository -y ppa:ethereum/ethereum-qt
-    add-apt-repository -y ppa:ethereum/ethereum
-    apt-get update
-    apt-get install ethereum -y
-  fi
-
   if [ $(program_is_installed nodejs) == 1 ]; then
     echo_pass "Nodejs"
   else
@@ -102,7 +91,6 @@ function echo_if {
 
 # command line programs
 echo "node          $(echo_if $(program_is_installed node))"
-echo "ethereum         $(echo_if $(program_is_installed ethereum))"
 echo "avahi-utils         $(echo_if $(program_is_installed avahi-utils))"
 
 

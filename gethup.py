@@ -135,11 +135,11 @@ class Gethup(object):
                    ' --rpccorsdomain "*"' + \
                    ' --rpcapi "admin,db,eth,net,web3,shh"' + \
                    ' --nodiscover' + \
-                   ' --mine' + \
-                   ' --minerthreads 1' + \
+                   ' --autodag=false' + \
                    ' --fast' + \
                    ' --shh' + \
                    ' --lightkdf' + \
+                   ' --dev' + \
                    ' js ./mine.js'
 
         return geth_cmd
@@ -206,5 +206,5 @@ class Gethup(object):
         if self.accno != '':
             print self.accno
             geth_command = self.givegeth(self.accno)
-            final_run = self.execute(geth_command, param="IPC endpoint opened")
+            final_run = self.execute(geth_command, param="IPC service started")
             print "geth-----\n" + str(final_run["val"])
