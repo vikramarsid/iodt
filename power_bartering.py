@@ -37,9 +37,11 @@ class PowerBartering:
         if web3.shh.hasIdentity(mid):
             options = {"topics": ["0x696f64745f706f7765725f626172746572696e67"],
                        "payload": "0x73656e64506f7765725573616765"}
-            web3.shh.post()
+            broadcast = web3.shh.post(options)
+            return broadcast
 
 
 if __name__ == '__main__':
     pb = PowerBartering("active")
     print(pb.get_power_usage())
+    print(pb.peer_usage())

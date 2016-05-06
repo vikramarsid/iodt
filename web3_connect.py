@@ -1,12 +1,9 @@
-from os.path import expanduser
-
-from web3 import Web3, IPCProvider
+from web3 import Web3, RPCProvider
 
 from config_map import ConfigMap
 
 config = ConfigMap()
-ipc_path = expanduser("~") + "/iodt-node" + '/data/' + config.config_section_map("instance")['id'] + '/geth.ipc'
-web3 = Web3(IPCProvider(ipc_path, testnet=False))
+web3 = Web3(RPCProvider(host="127.0.0.1", port=config.config_section_map("device")["rpcport"]))
 web3.config.defaultAccount = config.config_section_map("instance")["account"]
 web3.config.defaultBlock = "latest"
 

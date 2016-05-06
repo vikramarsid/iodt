@@ -54,7 +54,7 @@ class Gethup(object):
         shh_id = set_web3.set_identity()  # setting shh_id
         payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
                    'device_id': self.device_id, 'account': self.accno, 'name': self.device_name,
-                   'network_id': self.network_id, 'shh_id': shh_id,
+                   'network_id': self.network_id,
                    'id': str(randint(0, 1000))}
 
         headers = {'Content-type': 'application/json'}
@@ -133,6 +133,7 @@ class Gethup(object):
                    ' --datadir ' + self.datadir + \
                    ' --unlock ' + curaccno + \
                    ' --password <(echo -n ' + self.instance_id + ')' + \
+                   ' --port 30303' + \
                    ' --rpc' + \
                    ' --rpcaddr 0.0.0.0' + \
                    ' --rpcport ' + self.rpcport + \
@@ -144,6 +145,8 @@ class Gethup(object):
                    ' --shh' + \
                    ' --lightkdf' + \
                    ' --dev' + \
+                   ' --verbosity="5"' + \
+                   ' --maxpeers 50' + \
                    ' js ./mine.js'
 
         return geth_cmd
