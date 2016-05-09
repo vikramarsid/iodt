@@ -8,25 +8,33 @@ import subprocess
 import time
 from multiprocessing.pool import ThreadPool
 from os.path import expanduser
-from random import randint
 from shutil import *
 
 from flask import json
 
 import web3_connect
 from config_map import ConfigMap
+from feeder import Feeder
+from power_bartering import PowerBartering
 
 config = ConfigMap()
 pool = ThreadPool(processes=1)
 set_web3 = web3_connect.Web3Connect()
+upload_data = Feeder()
 
 class Gethup(object):
     # start up initials
     device_id = config.config_section_map("device")['id']
     device_name = config.config_section_map("device")['name']
     instance_id = config.config_section_map("instance")['id']
-    server_url = config.config_section_map("server")['dev-url']
+    server_url = config.config_section_map("server")['url'] + 'devices'
+    shh_id = config.config_section_map("instance")['shh_id']
+    network_id = config.config_section_map("instance")['network_id']
+    port = config.config_section_map("instance")['port']
+    c_addr = config.config_section_map("instance")['contract_address']
+    status = config.config_section_map("device")['status']
     directory = expanduser("~") + "/iodt-node"
+    device_power_level = PowerBartering(status).get_power_usage()
 
     # geth CLI params
     datetag = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
@@ -36,9 +44,7 @@ class Gethup(object):
     stablelog = directory + '/log/' + instance_id + '.log'
     keystore = directory + '/keystore/' + instance_id
     password = instance_id
-    port = '311' + instance_id
     rpcport = '82' + instance_id
-    network_id = '9030'
     enodeid = ''
     accno = ''
 
@@ -53,15 +59,18 @@ class Gethup(object):
         url = self.server_url
         shh_id = set_web3.set_identity()  # setting shh_id
         payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
-                   'device_id': self.device_id, 'account': self.accno, 'name': self.device_name,
-                   'network_id': self.network_id,
-                   'id': str(randint(0, 1000))}
+                   'device_id': self.device_id, 'account': self.accno, 'name': self.device_name, 'status': self.status,
+                   'network_id': self.network_id, 'shh_id': self.shh_id, 'contract_addr': self.c_addr,
+                   'power_usage': self.device_power_level,
+                   'id': str(int(time.time()))}
 
         headers = {'Content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
             print "Global Call: " + r.text
-            config.write_power_profile("50", "1")  # setting powerlimit and priority
+            rest = json.loads(r.text)
+            # config.write_power_profile(rest["power_usage"], rest["id"])  # setting powerlimit and priority
+            aync_call = pool.apply_async(upload_data.run)
         return r.text
 
     def local_curl(self, strs):
@@ -74,6 +83,7 @@ class Gethup(object):
         if (r.status_code == 200):
             self.enodeid = d["result"]["id"]
             print "------------------" + d["result"]["enode"]
+            config.write_config("instance", "enode", self.enodeid)
             print "pushing to CMS------"
             self.ext_curl()
         return self.enodeid
@@ -133,7 +143,7 @@ class Gethup(object):
                    ' --datadir ' + self.datadir + \
                    ' --unlock ' + curaccno + \
                    ' --password <(echo -n ' + self.instance_id + ')' + \
-                   ' --port 30303' + \
+                   ' --port ' + self.port + \
                    ' --rpc' + \
                    ' --rpcaddr 0.0.0.0' + \
                    ' --rpcport ' + self.rpcport + \

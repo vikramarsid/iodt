@@ -1,2 +1,6 @@
+sudo apt-get install python-dev
 sudo pip install requests
 sudo pip install flask
+sudo pip install apscheduler
+sudo pip install sha3
+
