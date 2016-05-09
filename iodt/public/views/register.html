@@ -1,0 +1,79 @@
+<div ng-controller="MainCtrl" class="container">
+	<div class="row">
+		<div class="col-xs-offset-3 col-xs-6">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Register</h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<form name="registerForm" role="form" data-parsley-validate="" class="form-horizontal form-label-left" novalidate="">
+						<div class="form-group">
+							<label class="control-label col-xs-3" for="first-name">User Name * </label>
+							<div class="col-xs-6">
+								<input type="text" id="usrid" class="form-control">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">Full Name * </label>
+							<div class="col-xs-6">
+								<input type="text" id="name" class="form-control">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">E-Mail * </label>
+							<div class="col-xs-6">
+								<input type="text" id="email" class="form-control">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">Password * </label>
+							<div class="col-xs-6">
+								<input type="password" id="pwd" class="form-control">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">Number * </label>
+							<div class="col-xs-6">
+								<input type="text" id="number" class="form-control">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">Gender * </label>
+							<div class="col-xs-6">
+								<div id="gender" class="btn-group" data-toggle="buttons">
+									<label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+										<input type="radio" name="gender" value="Male"> &nbsp; Male &nbsp;
+									</label>
+									<label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+										<input type="radio" name="gender" value="Female"> Female
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">DOB * </label>
+							<div class="col-xs-6">
+								<input type="text" id="dob" class="date-picker form-control active">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-xs-3">City * </label>
+							<div class="col-xs-6">
+								<input type="text" id="address" class="form-control">
+							</div>
+						</div>
+						<div class="col-sm-offset-4" id="registerMsg"></div>
+						<div class="ln_solid"></div>
+						<div class="form-group">
+							<div class="col-xs-6 col-xs-offset-3">
+								<button id="registerCancel" ng-click="cancel()" class="btn btn-primary">Cancel</button>
+								<button id="registerButton" ng-click="registerButton()" class="btn btn-success">Submit</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

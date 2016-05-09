@@ -1,0 +1,207 @@
+<div ng-controller="DevicesCtrl">
+
+<div class="well">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="x_panel">
+					<div class="x_title">
+						<div class="pull-right">
+							<h2><label class="label label-primary" data-toggle="modal" data-target="#new"><i class="fa fa-plus"></i>&nbsp;Create</label></h2>
+						</div>
+						<h2><i class="fa fa-connectdevelop"></i> Devices</h2>
+						<div class="clearfix"></div>
+					</div>
+					<div class="x_content">
+						<table class="table table-striped responsive-utilities jambo_table">
+							<thead>
+								<tr>
+									<th>Device ID</th>
+									<th>Name</th>
+									<th>Enode</th>
+									<th>Host</th>
+									<th>Description</th>
+									<th>Power Usage</th>
+									<th>Priority</th>
+									<th>Status</th>
+									<th>Created At</th>
+									<th>Updated At</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="device in devices">
+									<td scope="row">{{device.device_id}}</td>
+									<td>{{device.name}}</td>
+									<td>{{device.enode}}</td>
+									<td>{{device.host}}</td>
+									<td>{{device.description}}</td>
+									<td>{{device.power_usage}}</td>
+									<td>{{device.priority}}</td>
+									<td>
+										<span ng-if="device.status == 'active'" class="label label-success">&nbsp;{{device.status}}&nbsp;</span>
+										<span ng-if="device.status == 'inactive'" class="label label-default">{{device.status}}</span>
+									</td>
+									<td>{{device.created_at | date:'MM/dd/yyyy'}}</td>
+									<td>{{device.updated_at | date:'MM/dd/yyyy'}}</td>
+									<td>
+										<label ng-click="updateDevice(device)" class="label label-warning" data-toggle="modal" data-target="#edit"><i class="fa fa-edit"></i>&nbsp;Edit</label>
+										<label ng-click="deleteDevice(device)" class="label label-danger" data-toggle="modal" data-target="#delete"><i class="fa fa-trash"></i>&nbsp;Delete</label>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="new" role="dialog" aria-labelledby="createlbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" ng-click="clearForm()" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="createlbl">Add New Device</h4>
+			</div>
+			<div class="modal-body">
+				<form name="createDeviceForm" role="form" class="form-horizontal form-label-left" novalidate>
+					<div class="form-group">
+						<label for="device_id" class="control-label col-xs-3">Device ID</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="device_id" ng-model="createDeviceForm.device_id">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="control-label col-xs-3">Name</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="name" ng-model="createDeviceForm.name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="enode" class="control-label col-xs-3">E-Node</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="enode" ng-model="createDeviceForm.enode">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="host" class="control-label col-xs-3">Host</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="host" ng-model="createDeviceForm.host">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="description" class="control-label col-xs-3">Description</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="description" ng-model="createDeviceForm.description">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="power_usage" class="control-label col-xs-3">Power Usage</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="power_usage" ng-model="createDeviceForm.power_usage">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="priority" class="control-label col-xs-3">Priority</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="priority" ng-model="createDeviceForm.priority">
+						</div>
+					</div>
+				</form>
+				<div class="col-sm-offset-4" id="createDeviceMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="createDeviceButton" ng-click="createDevice(createDeviceForm)" type="button" class="btn btn-primary">Add</button>
+				<button type="button" ng-click="clearForm()" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="edit" role="dialog" aria-labelledby="editlbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editlbl">Edit Device</h4>
+			</div>
+			<div class="modal-body">
+				<form name="editDeviceForm" role="form" class="form-horizontal form-label-left" novalidate>
+					<div class="form-group">
+						<label for="device_id" class="control-label col-xs-3">Device ID</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="device_id" ng-model="editDeviceForm.device_id">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="control-label col-xs-3">Name</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="name" ng-model="editDeviceForm.name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="enode" class="control-label col-xs-3">E-Node</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="enode" ng-model="editDeviceForm.enode">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="host" class="control-label col-xs-3">Host</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="host" ng-model="editDeviceForm.host">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="description" class="control-label col-xs-3">Description</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="description" ng-model="editDeviceForm.description">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="power_usage" class="control-label col-xs-3">Power Usage</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="power_usage" ng-model="editDeviceForm.power_usage">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="priority" class="control-label col-xs-3">Priority</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="priority" ng-model="editDeviceForm.priority">
+						</div>
+					</div>
+				</form>
+				<div class="col-sm-offset-4" id="updateDeviceMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="editDeviceButton" ng-click="doUpdateDevice(editDeviceForm)" type="button" class="btn btn-primary">Update</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="delete" role="dialog" aria-labelledby="deletelbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="deletelbl">Are you sure you want to delete?</h4>
+			</div>
+			<div class="modal-body">
+				<div id="deleteDeviceMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button id="deleteDeviceButton" ng-click="doDeleteDevice(deleteDeviceForm)" type="button" class="btn btn-danger">Delete</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+</div>

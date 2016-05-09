@@ -1,0 +1,315 @@
+<div ng-controller="ClustersCtrl">
+
+
+<div class="well">
+
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="x_panel">
+					<div class="x_title">
+						<div class="pull-right">
+							<h2><label class="label label-primary" data-toggle="modal" data-target="#new"><i class="fa fa-plus"></i>&nbsp;Create</label></h2>
+						</div>
+						<h2><i class="fa fa-database"></i> Clusters</h2>
+						<div class="clearfix"></div>
+					</div>
+					<div class="x_content">
+						<table class="table table-striped responsive-utilities jambo_table">
+							<thead>
+								<tr>
+									<th>Cluster ID</th>
+									<th>Name</th>
+									<th>Description</th>
+									<th>Power Limit</th>
+									<th>Created At</th>
+									<th>Updated At</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="cluster in clusters" ng-click="loadDevices(cluster)">
+									<td scope="row">{{cluster.cluster_id}}</td>
+									<td>{{cluster.name}}</td>
+									<td>{{cluster.description}}</td>
+									<td>{{cluster.power_limit}}</td>
+									<td>{{cluster.created_at | date:'MM/dd/yyyy'}}</td>
+									<td>{{cluster.updated_at | date:'MM/dd/yyyy'}}</td>
+									<td>
+										<label ng-click="updateCluster(cluster)" class="label label-warning" data-toggle="modal" data-target="#edit"><i class="fa fa-edit"></i>&nbsp;Edit</label>
+										<label ng-click="deleteCluster(cluster)" class="label label-danger" data-toggle="modal" data-target="#delete"><i class="fa fa-trash"></i>&nbsp;Delete</label>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div ng-if="selectedCluster" class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="x_panel">
+					<div class="x_title">
+						<div class="pull-right">
+							<h2><label class="label label-primary" data-toggle="modal" data-target="#addDevice"><i class="fa fa-plus"></i>&nbsp;Add Devices</label></h2>
+						</div>
+						<h2><i class="fa fa-connectdevelop"></i> Devices</h2>
+						<div class="clearfix"></div>
+					</div>
+					<div class="x_content">
+						<table class="table table-striped responsive-utilities jambo_table">
+							<thead>
+								<tr>
+									<th>Device ID</th>
+									<th>Name</th>
+									<th>Enode</th>
+									<th>Host</th>
+									<th>Description</th>
+									<th>Power Usage</th>
+									<th>Priority</th>
+									<th>Status</th>
+									<th>Created At</th>
+									<th>Updated At</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="device in devicesOfSelectedCluster">
+									<td scope="row">{{device.device_id}}</td>
+									<td>{{device.name}}</td>
+									<td>{{device.enode}}</td>
+									<td>{{device.host}}</td>
+									<td>{{device.description}}</td>
+									<td>{{device.power_usage}}</td>
+									<td>{{device.priority}}</td>
+									<td>
+										<span ng-if="device.status == 'active'" class="label label-success">&nbsp;{{device.status}}&nbsp;</span>
+										<span ng-if="device.status == 'inactive'" class="label label-default">{{device.status}}</span>
+									</td>
+									<td>{{device.created_at | date:'MM/dd/yyyy'}}</td>
+									<td>{{device.updated_at | date:'MM/dd/yyyy'}}</td>
+									<td>
+										<label ng-click="removeDevice(device)" class="label label-info" data-toggle="modal" data-target="#removeDevice"><i class="fa fa-edit"></i>&nbsp;Remove</label>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<div class="modal fade" id="new" role="dialog" aria-labelledby="createlbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" ng-click="clearForm()" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="createlbl">Add New Cluster</h4>
+			</div>
+			<div class="modal-body">
+				<form name="createClusterForm" role="form" class="form-horizontal form-label-left" novalidate>
+<!--
+					<div class="form-group">
+						<label for="cluster_id" class="control-label col-xs-3">Cluster ID</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="cluster_id" ng-model="createClusterForm.cluster_id">
+						</div>
+					</div>
+ -->
+					<div class="form-group">
+						<label for="name" class="control-label col-xs-3">Name</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="name" ng-model="createClusterForm.name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="description" class="control-label col-xs-3">Description</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="description" ng-model="createClusterForm.description">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="power_limit" class="control-label col-xs-3">Power Limit</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="power_limit" ng-model="createClusterForm.power_limit">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="devices" class="control-label col-xs-3">Devices</label>
+						<div class="col-xs-6">
+							<table class="table responsive-utilities bulk_action">
+								<thead>
+									<tr>
+										<th></th>
+										<th>DeviceID</th>
+										<th>Name</th>
+										<th>Enode</th>
+										<th>Host</th>
+										<th>Created At</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="unassignedDevice in unassignedDevices">
+										<td>
+											<input ng-model="createClusterForm.devices[unassignedDevice.device_id]" type="checkbox" name="createClusterForm.unassignedDevicesCheckbox">
+										</td>
+										<td>{{unassignedDevice.device_id}}</td>
+										<td>{{unassignedDevice.name}}</td>
+										<td>{{unassignedDevice.enode}}</td>
+										<td>{{unassignedDevice.host}}</td>
+										<td>{{unassignedDevice.created_at | date:'MM/dd/yyyy'}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</form>
+				<div class="col-sm-offset-4" id="createClusterMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="createClusterButton" ng-click="createCluster(createClusterForm)" type="button" class="btn btn-primary">Add</button>
+				<button type="button" ng-click="clearForm()" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="edit" role="dialog" aria-labelledby="editlbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editlbl">Edit Cluster</h4>
+			</div>
+			<div class="modal-body">
+				<form name="editClusterForm" role="form" class="form-horizontal form-label-left" novalidate>
+					<div class="form-group">
+						<label for="cluster_id" class="control-label col-xs-3">Cluster ID</label>
+						<div class="col-xs-6">
+							<input disabled type="text" class="form-control" id="cluster_id" ng-model="editClusterForm.cluster_id">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="control-label col-xs-3">Name</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="name" ng-model="editClusterForm.name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="description" class="control-label col-xs-3">Description</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="description" ng-model="editClusterForm.description">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="power_limit" class="control-label col-xs-3">Power Limit</label>
+						<div class="col-xs-6">
+							<input type="text" class="form-control" id="power_limit" ng-model="editClusterForm.power_limit">
+						</div>
+					</div>
+				</form>
+				<div class="col-sm-offset-4" id="updateClusterMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="editClusterButton" ng-click="doUpdateCluster(editClusterForm)" type="button" class="btn btn-primary">Update</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="delete" role="dialog" aria-labelledby="deletelbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="deletelbl">Are you sure you want to delete?</h4>
+			</div>
+			<div class="modal-body">
+				<div id="deleteClusterMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button id="deleteClusterButton" ng-click="doDeleteCluster(deleteClusterForm)" type="button" class="btn btn-danger">Delete</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="addDevice" role="dialog" aria-labelledby="addlbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="createlbl">Add New Devices to Cluster</h4>
+			</div>
+			<div class="modal-body">
+				<form name="addDevices" role="form" class="form-horizontal form-label-left" novalidate>
+					<div class="form-group">
+						<table class="table table-striped responsive-utilities bulk_action">
+							<thead>
+								<tr>
+									<th></th>
+									<th>DeviceID</th>
+									<th>Name</th>
+									<th>Enode</th>
+									<th>Host</th>
+									<th>Created At</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="unassignedDevice in unassignedDevices">
+									<td>
+										<input ng-model="addDevices.devices[unassignedDevice.device_id]" type="checkbox" name="addDevices.unassignedDevicesCheckbox">
+									</td>
+									<td>{{unassignedDevice.device_id}}</td>
+									<td>{{unassignedDevice.name}}</td>
+									<td>{{unassignedDevice.enode}}</td>
+									<td>{{unassignedDevice.host}}</td>
+									<td>{{unassignedDevice.created_at | date:'MM/dd/yyyy'}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</form>
+				<div class="col-sm-offset-4" id="addDevicesMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="addDevicesToClusterButton" ng-click="addDevicesToCluster(addDevices)" type="button" class="btn btn-primary">Add</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="removeDevice" role="dialog" aria-labelledby="removelbl" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="removelbl">Are you sure you want to remove this device from cluster?</h4>
+			</div>
+			<div class="modal-body">
+				<div id="removeDeviceMsg"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button id="removeDeviceButton" ng-click="doRemoveDevice(removeDeviceForm)" type="button" class="btn btn-danger">Remove</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+</div>

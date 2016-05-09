@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" ng-app="iodt">
+<head>
+	<meta charset="UTF-8">
+	<title>IoDT</title>
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" type="text/css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.1/animate.css" type="text/css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.1/css/font-awesome.css" type="text/css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.css" type="text/css">
+	<link rel="stylesheet" href="css/custom.css">
+
+	<!-- JS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-route.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.js"></script>
+
+	<!-- ANGULAR CUSTOM -->
+	<script src="js/app.js"></script>
+	<script src="js/appRoutes.js"></script>
+	<script src="js/controllers/MainCtrl.js"></script>
+	<script src="js/controllers/DashboardCtrl.js"></script>
+	<script src="js/controllers/DevicesCtrl.js"></script>
+	<script src="js/controllers/ClustersCtrl.js"></script>
+</head>
+
+<body>
+	<div ng-controller="MainCtrl">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#/">IoDT</a>
+			</div>
+			<div class="navbar-header navbar-right">
+				<div id="loginDiv" style="padding-top: 10px;">
+					<a href="#/login" type="button" class="btn btn-primary">Log In</a>
+					<a href="#/register" type="button" class="btn btn-primary">Register</a>
+				</div>
+				<div id="logoutDiv" style="display: none; padding-top: 10px;">
+					<div class="btn btn-info">Hi <div id='userNameDiv' style="display: inline;"></div></div>
+					<a href="#/logout" type="button" class="btn btn-warning" id="logOutBtn" ng-click="logOut()">Log Out</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div ng-view></div>
+
+</body>
+
+</html>
