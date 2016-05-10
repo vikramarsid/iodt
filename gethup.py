@@ -57,7 +57,6 @@ class Gethup(object):
 
     def ext_curl(self):
         url = self.server_url
-        shh_id = set_web3.set_identity()  # setting shh_id
         payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
                    'device_id': self.device_id, 'account': self.accno, 'name': self.device_name, 'status': self.status,
                    'network_id': self.network_id, 'shh_id': self.shh_id, 'contract_addr': self.c_addr,
@@ -67,7 +66,7 @@ class Gethup(object):
         headers = {'Content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
-            print "Global Call: " + r.text
+            print("Global Call: " + r.text)
             rest = json.loads(r.text)
             # config.write_power_profile(rest["power_usage"], rest["id"])  # setting powerlimit and priority
             aync_call = pool.apply_async(upload_data.run)
@@ -75,21 +74,25 @@ class Gethup(object):
 
     def local_curl(self, strs):
         config.write_config("instance", "account", self.accno)
-        localURL = "http://localhost:" + self.rpcport
+        shh_id = set_web3.set_identity()  # setting shh_id
+        if shh_id:
+            print ("==========shh_id===============\n" + shh_id)
+
+        local_url = "http://localhost:" + self.rpcport
         payload = '{"jsonrpc": "2.0", "method": "admin_nodeInfo", "params": [], "id": 74}'
-        r = requests.post(localURL, data=payload)
+        r = requests.post(local_url, data=payload)
         d = json.loads(r.text)
-        print d["result"]["enode"]
-        if (r.status_code == 200):
+        print(d["result"]["enode"])
+        if r.status_code == 200:
             self.enodeid = d["result"]["id"]
-            print "------------------" + d["result"]["enode"]
+            # print ("------------------" + d["result"]["enode"])
             config.write_config("instance", "enode", self.enodeid)
-            print "pushing to CMS------"
+            print ("pushing to CMS------")
             self.ext_curl()
         return self.enodeid
 
     def execute(self, cmd, *args, **kwargs):
-        print "---executing command : " + cmd
+        print ("---executing command : " + cmd)
         found = ''
         stdout = []
         p = subprocess.Popen(cmd, shell=True, executable='/bin/bash', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -102,7 +105,7 @@ class Gethup(object):
                 if m:
                     found = m.string[m.string.find(param):len(m.string)]
                     async_result = pool.apply_async(self.local_curl(found))
-            print line
+            print (line)
 
             if line == '' and p.poll() != None:
                 break
@@ -111,22 +114,24 @@ class Gethup(object):
         p.communicate()
         return {"ret": p.returncode, "val": ''.join(stdout), "found": found}
 
-    def mkdir(self, path):
+    @staticmethod
+    def mkdir(path):
 
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
-                print "---Directory create--- " + path
+                print ("---Directory create--- " + path)
         except OSError as exc:
             if exc.errno == errno.EEXIST and os.path.isdir(path):
                 pass
             else:
                 raise
 
-    def copy(self, src, dst):
+    @staticmethod
+    def copy(src, dst):
 
         try:
-            print "---Copying--- \n" + src + " to " + dst
+            print ("---Copying--- \n" + src + " to " + dst)
             copytree(src, dst)
 
         except OSError as exc:
@@ -167,16 +172,16 @@ class Gethup(object):
 
         directory = self.directory
         instance_id = self.instance_id
-        datetag = self.datetag
+        # datetag = self.datetag
         datadir = self.datadir
         log = self.log
         linklog = self.linklog
-        stablelog = self.stablelog
+        # stablelog = self.stablelog
         keystore = self.keystore
-        password = self.password
-        port = self.port
-        rpcport = self.rpcport
-        network_id = self.network_id
+        # password = self.password
+        # port = self.port
+        # rpcport = self.rpcport
+        # network_id = self.network_id
 
         # bash commands
 
@@ -189,7 +194,7 @@ class Gethup(object):
                      ' --password <(echo -n ' + instance_id + ') account new'
 
         # create main directory
-        print directory
+        print (directory)
         self.mkdir(directory)
         self.mkdir(directory + '/data/')
         self.mkdir(directory + '/log/')
@@ -207,22 +212,22 @@ class Gethup(object):
             self.mkdir(keystore)
         acc_status = self.execute(str(create_acc))
         if acc_status["ret"] == 0:
-            print "Copying keystore"
+            print ("Copying keystore")
             self.copy(datadir + '/keystore', keystore)
 
         if not os.path.exists(datadir + '/keystore'):
-            print "Copying keys"
+            print ("Copying keys")
             self.copy(keystore + '/keystore', datadir + '/keystore')
 
         account_no = self.execute(account_cmd)
         logno = str(account_no["val"])
-        temp = logno.find("{")
+        # temp = logno.find("{")
         self.accno = logno[logno.find("{") + 1:logno.find("}")]
-        print "account_no-----\n" + self.accno
+        print ("account_no-----\n" + self.accno)
 
         if self.accno != '':
-            print self.accno
+            print (self.accno)
             geth_command = self.givegeth(self.accno)
             # final_run = self.execute(geth_command, param="IPC service started")
             final_run = self.execute(geth_command, param="IPC endpoint opened")
-            print "geth-----\n" + str(final_run["val"])
+            print ("geth-----\n" + str(final_run["val"]))
