@@ -30,19 +30,9 @@ accno = config.config_section_map("instance")['account']
 
 
 class Feeder(object):
-    """ The run() method will be started and it will run in the background
-    until the application exits.
-    """
-
     def __init__(self, interval=1):
-        # """ Constructor
-        # :type interval: int
-        # :param interval: Check interval, in seconds
-        # """
         self.interval = interval
-        # thread = threading.Thread(target=self.run, args=())
-        # thread.daemon = True                            # Daemonize thread
-        # thread.start()                                  # Start the execution
+
 
     @staticmethod
     def get_ip_address():
@@ -71,12 +61,9 @@ class Feeder(object):
 
     def run(self):
         print('Doing something imporant in the background')
-        schedule.every(0.1).minutes.do(self.job)
-        # schedule.every().hour.do(self.job)
+        # schedule.every(0.1).minutes.do(self.job)
+        schedule.every(1).hour.do(self.job)
         # schedule.every().day.at("10:30").do(job)
         while True:
             schedule.run_pending()
             time.sleep(1)
-
-            # example = Feeder()
-            # example.run()
