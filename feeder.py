@@ -9,12 +9,10 @@ from flask import json
 import schedule
 from config_map import ConfigMap
 from power_bartering import PowerBartering
-
-config = ConfigMap()
 from web3_connect import Web3Connect
 
+config = ConfigMap()
 set_web3 = Web3Connect()
-
 device_id = config.config_section_map("device")['id']
 device_name = config.config_section_map("device")['name']
 instance_id = config.config_section_map("instance")['id']
@@ -46,7 +44,8 @@ class Feeder(object):
         # thread.daemon = True                            # Daemonize thread
         # thread.start()                                  # Start the execution
 
-    def get_ip_address(self):
+    @staticmethod
+    def get_ip_address():
         gw = os.popen("ip -4 route show default").read().split()
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect((gw[2], 0))
@@ -56,7 +55,6 @@ class Feeder(object):
     def job(self):
         print("Updating Central Database - " + str(time.time()))
         url = server_url
-        shh_id = set_web3.set_identity()  # setting shh_id
         payload = {'enode': enode, 'host': self.get_ip_address(), 'rpcport': rpcport, 'port': port,
                    'device_id': device_id, 'account': accno, 'name': device_name, 'status': status,
                    'network_id': network_id, 'shh_id': shh_id, 'contract_addr': c_addr,
@@ -66,7 +64,7 @@ class Feeder(object):
         headers = {'Content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
-            print "Global Call: " + r.text
+            print("Global Call: " + r.text)
             rest = json.loads(r.text)
             config.write_power_profile(rest["power_usage"], rest["id"])  # setting powerlimit and priority
         return r.text

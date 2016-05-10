@@ -22,6 +22,7 @@ pool = ThreadPool(processes=1)
 set_web3 = web3_connect.Web3Connect()
 upload_data = Feeder()
 
+
 class Gethup(object):
     # start up initials
     device_id = config.config_section_map("device")['id']
@@ -48,7 +49,8 @@ class Gethup(object):
     enodeid = ''
     accno = ''
 
-    def get_ip_address(self):
+    @staticmethod
+    def get_ip_address():
         gw = os.popen("ip -4 route show default").read().split()
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect((gw[2], 0))
@@ -107,7 +109,7 @@ class Gethup(object):
                     async_result = pool.apply_async(self.local_curl(found))
             print (line)
 
-            if line == '' and p.poll() != None:
+            if line == '' and not p.poll():
                 break
 
         p.wait()
