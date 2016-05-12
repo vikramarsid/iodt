@@ -1,7 +1,9 @@
-import requests
-import json
-from zeroconf import *
 import socket
+
+from config_map import ConfigMap
+from zeroconf import *
+
+config = ConfigMap()
 
 
 class ServiceListener(object):
@@ -9,25 +11,23 @@ class ServiceListener(object):
         self.r = Zeroconf()
 
     def removeService(self, zeroconf, type, name):
-        print
-        print "Service", name, "removed"
+        print ("Service " + name + "removed")
 
     def addService(self, zeroconf, type, name):
-        print
-        print "Service", name, "added"
-        print "  Type is", type
+        print ("Service " + name + " added")
+        print ("  Type is " + type)
         info = self.r.getServiceInfo(type, name)
         if info:
             ipaddrs = socket.inet_ntoa(info.getAddress())
             portaddr = info.getPort()
-            enodeurl = self.curl_url()
-            print "  Address is %s:%d" % (ipaddrs, portaddr)
-            print "enode url %s" % (enodeurl)
-            print "  Weight is %d, Priority is %d" % (info.getWeight(), info.getPriority())
-            print "  Server is", info.getServer()
+            addr = str(ipaddrs) + ":7000/api/"
+            print ("  Address is " + addr)
+            print ("  Weight is " + str(info.getWeight()) + ", Priority is " + str(info.getPriority()))
+            print ("  Server is" + str(info.getServer()))
             prop = info.getProperties()
             if prop:
-                print "  Properties are"
+                print ("  Properties are\n")
                 for key, value in prop.items():
-                    print "    %s: %s" % (key, value)
-            return ipaddrs
+                    print (key + ":" + value)
+            config.write_config("server", "url", "http://" + addr)
+            return addr

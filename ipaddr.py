@@ -67,13 +67,14 @@ class test(object):
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
             rest = json.loads(r.text)
+            print (rest["Users"][0]["email"])
             peers = rest["Devices"]
             # config.write_config("userprofile", "peercount", peers.__len__())
             for device in peers:
                 peer_priority.update({device["shh_id"]: device["priority"]})
             if peer_priority.__len__() > 0:
                 sorted_priority = sorted(peer_priority.items(), key=operator.itemgetter(1))
-                print (sorted_priority)
+                # print (sorted_priority)
             return sorted_priority
 
 
@@ -107,5 +108,5 @@ class test(object):
 
 if __name__ == '__main__':
     exe = test()
-    exe.retina()
-    # exe.get_peer_priority()
+    # exe.retina()
+    exe.get_peer_priority()

@@ -16,7 +16,7 @@ set_web3 = Web3Connect()
 device_id = config.config_section_map("device")['id']
 device_name = config.config_section_map("device")['name']
 instance_id = config.config_section_map("instance")['id']
-server_url = config.config_section_map("server")['url'] + 'devices'
+server_url = config.config_section_map("server")['url']
 shh_id = config.config_section_map("instance")['shh_id']
 network_id = config.config_section_map("instance")['network_id']
 port = config.config_section_map("instance")['port']
@@ -42,9 +42,9 @@ class Feeder(object):
         ipaddr = s.getsockname()[0]
         return ipaddr
 
-    def job(self):
+    def device_job(self):
         print("Updating Central Database - " + str(time.time()))
-        url = server_url
+        url = server_url + 'devices'
         payload = {'enode': enode, 'host': self.get_ip_address(), 'rpcport': rpcport, 'port': port,
                    'device_id': device_id, 'account': accno, 'name': device_name, 'status': status,
                    'network_id': network_id, 'shh_id': shh_id, 'contract_addr': c_addr,
@@ -55,14 +55,30 @@ class Feeder(object):
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
             print("Global Call: " + r.text)
+            # rest = json.loads(r.text)
+            # config.write_power_profile(rest["power_usage"], rest["id"])  # setting powerlimit and priority
+        return r.text
+
+    @staticmethod
+    def user_job():
+        print("Updating user details - " + str(time.time()))
+        url = server_url + 'iodt/peerinfo'
+        payload = {'device_id': device_id}
+        headers = {'Content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        if r.status_code == 200:
+            print("received user details: " + r.text)
             rest = json.loads(r.text)
-            config.write_power_profile(rest["power_usage"], rest["id"])  # setting powerlimit and priority
+            config.write_power_profile(rest["Clusters"][0]["power_limit"],
+                                       rest["Clusters"][0]["cluster_id"])  # setting powerlimit and priority
+            config.write_config("userprofile", "email", rest["Users"][0]["email"])
         return r.text
 
     def run(self):
         print('Doing something imporant in the background')
         # schedule.every(0.1).minutes.do(self.job)
         schedule.every(1).hour.do(self.job)
+        schedule.every(1).hour.do(self.user_job())
         # schedule.every().day.at("10:30").do(job)
         while True:
             schedule.run_pending()
