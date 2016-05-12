@@ -29,6 +29,11 @@ methods = [
         "params": 1
     },
     {
+        "name": "getMessages",
+        "call": "shh_getMessages",
+        "params": 0
+    },
+    {
         "name": "newGroup",
         "call": "shh_newGroup",
         "params": 0

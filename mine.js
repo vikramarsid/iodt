@@ -1,6 +1,3 @@
-// Adapted from Iuri Matias' Embark framework
-// https://github.com/iurimatias/embark-framework
-// Modified by ryepdx to mine at regular intervals.
 (function () {
     var main = function () {
         /* TODO: Find a way to load mining config from YML.

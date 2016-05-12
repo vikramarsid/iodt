@@ -14,6 +14,7 @@ import time
 
 from flask import json
 
+import schedule
 import web3_connect
 from config_map import ConfigMap
 
@@ -30,7 +31,6 @@ peer_shh_ids = []
 peer_contract_ids = []
 dict_req = {}
 dict_res = {}
-dict_post = {}
 
 class PowerBartering:
     def __init__(self, mode):
@@ -40,15 +40,15 @@ class PowerBartering:
     def get_power_usage():
         command = "upower -i $(upower -e | grep BAT) | grep --color=never -E percentage|xargs|cut -d' ' -f2|sed s/%//"
         get_batterydata = subprocess.Popen(["/bin/bash", "-c", command], stdout=subprocess.PIPE)
-        return get_batterydata.communicate()[0].decode("utf-8").replace("\n", "")
+        val = get_batterydata.communicate()[0].decode("utf-8").replace("\n", "")
+        return hex(val)
 
-    def limit_check(self):
-        usage = int(self.get_power_usage())
-        limit = int(config.config_section_map("userprofile")['powerlimit'])
-        if usage > limit:
-            e = self.get_peer_usage("shh")
-            return "Completed Power Sync Job" + str(e)
-        return "Usage under limit - Power Sync not needed"
+    def start_power_bartering(self):
+        schedule.every(1).minutes.do(self.get_peer_usage("shh"))
+        # schedule.every(1).hour.do(self.get_peer_usage("shh"))
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
 
     def get_peer_usage(self, stype):
         print("Getting Peer details - " + str(time.time()))
@@ -59,11 +59,13 @@ class PowerBartering:
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         if r.status_code == 200:
             rest = json.loads(r.text)
+            peers = rest["Devices"]
+            config.write_config("userprofile", "peercount", peers.__len__())
             if stype == "shh":
-                for device in rest["Devices"]:
+                for device in peers:
                     peer_shh_ids.append(device["shh_id"])
                 if peer_shh_ids.__len__() > 0:
-                    print ("Broadcasting Power Requirements\n")
+                    print ("Broadcasting Power Requirements - " + str(time.time()))
                     self.broadcast_message()
 
             if stype == "contract":
@@ -76,6 +78,7 @@ class PowerBartering:
         print("in broadcast message")
         success = 0
         fail = 0
+        # TODO Call watch_request
         peers = peer_shh_ids.__len__()
         mid = config.config_section_map("instance")["shh_id"]
         if mid == '':
@@ -131,6 +134,19 @@ class PowerBartering:
             return getf
         return False
 
+    def get_allMessages(self, faddr):
+        print("in get all messages")
+        mid = config.config_section_map("instance")["shh_id"]
+        if mid == '':
+            mid = set_web3.set_identity()
+        if web3.shh.hasIdentity(mid):
+            options = faddr
+            getf = web3.shh.getMessages(options)
+            if getf:
+                print("Flushed Request Queue")
+            return getf
+        return False
+
     @staticmethod
     def set_request_topic():
         print("Setting request topic")
@@ -162,21 +178,57 @@ class PowerBartering:
     '''
 
     def watch_request(self):
+        success = 0
+        fail = 0
         mid = config.config_section_map("instance")["shh_id"]
         if mid == '':
             mid = set_web3.set_identity()
         req_addr = config.config_section_map("instance")["req_addr"]
+
         if not req_addr:
             req_addr = self.set_request_topic()
-        req = self.get_filter_changes(req_addr)
-        if req:
-            jreq = json.loads(req)
-            for i in range(jreq["result"].__len__()):
-                origin = jreq["result"][i]["from"]
-                sent = jreq["result"][i]["sent"]
-                dict_req.update({origin: sent})
+        peer_count = config.config_section_map("userprofile")["peercount"]
 
+        timeout = time.time() + 60 * 5  # set time out for 5 minutes from now
 
+        while True:
+            req = self.get_filter_changes(req_addr)
+            if req:
+                jreq = json.loads(req)
+                for i in range(jreq["result"].__len__()):
+                    origin = jreq["result"][i]["from"]
+                    sent = jreq["result"][i]["sent"]
+                    req_payload = jreq["result"][i]["payload"]
+                    if req_payload == power_usage_payload:
+                        dict_req.update({origin: sent})
+
+            if dict_req.keys().__len__() == peer_count:
+                break
+            else:
+                print ("Waiting for peer power request")
+
+            if time.time() > timeout:
+                break
+        if dict_req.keys().__len__() < peer_count:
+            print ("TIMEOUT:Missed messages from peers - please check power status of the peers")
+        current_usage = self.get_power_usage()
+
+        for key in dict_req.keys():
+            send_res = self.post_message(iodt_res_topic, current_usage, key, mid)  # Sending power usage reply
+            if send_res:
+                success += 1
+            else:
+                fail += 1
+
+        print ("\nTotal messages sent to peers: " + str(dict_req.keys().__len__()) + "\nTotal successful delivery : "
+               + str(success) + "\nTotal un-successful delivery: " + str(fail))
+
+        if success > 1:
+            dict_req.clear()  # clearing the dictionary
+            self.get_allMessages(req_addr)  # clearing queue
+            return "True"
+        else:
+            return "False"
 
                 # check = (topic == iodt_req_topic) & (origin is not mid)   # check to exclude self
                 # reply = self.post_message(iodt_res_topic, self.get_power_usage(), origin, mid)
@@ -219,4 +271,4 @@ if __name__ == '__main__':
     # print(pb.set_filter())
     # print(pb.get_filter_changes())
     # pb.get_peer_details("shh")
-    print (pb.watch())
+    # print (pb.watch())

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0d558187-80e0-454b-a149-80f66a8c48d5" name="Default" comment="Stable v1.7">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/ebconfigmappings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/get_user_profile.py" />
+    <list default="true" id="0d558187-80e0-454b-a149-80f66a8c48d5" name="Default" comment="Stable v1.8">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/device.config" afterPath="$PROJECT_DIR$/device.config" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ipaddr.py" afterPath="$PROJECT_DIR$/ipaddr.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mine.js" afterPath="$PROJECT_DIR$/mine.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/power_bartering.py" afterPath="$PROJECT_DIR$/power_bartering.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web3/web3/methods/shh.py" afterPath="$PROJECT_DIR$/web3/web3/methods/shh.py" />
     </list>
     <ignored path="cmpe295b_iodt.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,7 +23,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/cmpe295b_iodt$main.coverage" NAME="main Coverage Results" MODIFIED="1462837940982" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/cmpe295b_iodt$read_credentials.coverage" NAME="read_credentials Coverage Results" MODIFIED="1458279331014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/cmpe295b_iodt$ipaddr.coverage" NAME="ipaddr Coverage Results" MODIFIED="1462969357421" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/cmpe295b_iodt$ipaddr.coverage" NAME="ipaddr Coverage Results" MODIFIED="1463035929611" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/cmpe295b_iodt$feeder.coverage" NAME="feeder Coverage Results" MODIFIED="1462748848372" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/cmpe295b_iodt$host_connection.coverage" NAME="host_connection Coverage Results" MODIFIED="1458348063923" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/cmpe295b_iodt$DynamicDiscovery.coverage" NAME="DynamicDiscovery Coverage Results" MODIFIED="1458289582439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -49,10 +49,43 @@
       <file leaf-file-name="power_bartering.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/power_bartering.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="387">
-              <caret line="115" column="13" selection-start-line="115" selection-start-column="13" selection-end-line="115" selection-end-column="13" />
+            <state relative-caret-position="169">
+              <caret line="78" column="19" selection-start-line="78" selection-start-column="19" selection-end-line="78" selection-end-column="19" />
               <folding>
                 <element signature="e#475#490#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web3/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="25" column="21" selection-start-line="25" selection-start-column="21" selection-end-line="25" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shh.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web3/web3/methods/shh.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="149">
+              <caret line="31" column="28" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/schedule/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="387">
+              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+              <folding>
+                <marker date="1462814677654" expanded="true" signature="635:681" placeholder="..." />
+                <marker date="1462814677654" expanded="true" signature="851:912" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -61,21 +94,11 @@
       <file leaf-file-name="ipaddr.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ipaddr.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="107" column="0" selection-start-line="107" selection-start-column="0" selection-end-line="111" selection-end-column="38" />
+            <state relative-caret-position="194">
+              <caret line="68" column="30" selection-start-line="68" selection-start-column="30" selection-end-line="68" selection-end-column="30" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pydevd.py" pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="124">
-              <caret line="936" column="0" selection-start-line="936" selection-start-column="0" selection-end-line="936" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -107,8 +130,8 @@
       <file leaf-file-name="device.config" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/device.config">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="8" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
+            <state relative-caret-position="315">
+              <caret line="21" column="9" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -117,22 +140,10 @@
       <file leaf-file-name="feeder.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/feeder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
+            <state relative-caret-position="297">
+              <caret line="63" column="50" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="50" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -163,7 +174,6 @@
         <option value="$PROJECT_DIR$/DynamicDiscovery.py" />
         <option value="$PROJECT_DIR$/host_connection.py" />
         <option value="$PROJECT_DIR$/read_credentials.py" />
-        <option value="$PROJECT_DIR$/zeroconf.py" />
         <option value="$PROJECT_DIR$/gethup.sh" />
         <option value="$PROJECT_DIR$/dynamic_discovery.py" />
         <option value="$PROJECT_DIR$/genesis.json" />
@@ -187,13 +197,15 @@
         <option value="&lt;30ae6f57-fdca-4621-9753-7ba1a9ca9368&gt;/home/pi/startup/gethup.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/web3/web3/methods/shh.py" />
         <option value="&lt;30ae6f57-fdca-4621-9753-7ba1a9ca9368&gt;/home/pi/startup/device.config" />
         <option value="$PROJECT_DIR$/web3_connect.py" />
         <option value="$PROJECT_DIR$/gethup.py" />
         <option value="$PROJECT_DIR$/feeder.py" />
         <option value="$PROJECT_DIR$/get_user_profile.py" />
         <option value="$PROJECT_DIR$/device.config" />
+        <option value="$PROJECT_DIR$/zeroconf.py" />
+        <option value="$PROJECT_DIR$/web3/web3/methods/shh.py" />
+        <option value="$PROJECT_DIR$/mine.js" />
         <option value="$PROJECT_DIR$/ipaddr.py" />
         <option value="$PROJECT_DIR$/power_bartering.py" />
       </list>
@@ -282,8 +294,8 @@
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="js-jscs-nodeInterpreter" value="/usr/bin/node" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Downloads/pgesdk" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable" />
-    <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.CSS" />
+    <property name="settings.editor.splitter.proportion" value="0.2938296" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
@@ -731,7 +743,14 @@
       <option name="project" value="LOCAL" />
       <updated>1462842125826</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Stable v1.8">
+      <created>1462984695209</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1462984695209</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TodoView">
@@ -795,7 +814,8 @@
     <MESSAGE value="Stable v1.5" />
     <MESSAGE value="Stable v1.6" />
     <MESSAGE value="Stable v1.7" />
-    <option name="LAST_COMMIT_MESSAGE" value="Stable v1.7" />
+    <MESSAGE value="Stable v1.8" />
+    <option name="LAST_COMMIT_MESSAGE" value="Stable v1.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -859,26 +879,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="189" />
+      <option name="time" value="190" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///usr/local/lib/python2.7/dist-packages/web3/web3/method.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="113">
-          <caret line="101" column="0" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/lib/python2.7/dist-packages/web3/solidity/coder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="144" column="0" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/lib/python2.7/dist-packages/web3/web3/function.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="113">
@@ -1084,6 +1089,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="124">
           <caret line="1036" column="4" selection-start-line="1036" selection-start-column="4" selection-end-line="1036" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1113,30 +1119,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1205">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/schedule/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="123" column="8" selection-start-line="123" selection-start-column="8" selection-end-line="123" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web3/web3/methods/shh.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="27" column="37" selection-start-line="27" selection-start-column="37" selection-end-line="27" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web3/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="134">
-          <caret line="25" column="20" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1174,30 +1156,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dynamic_discovery.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="16" column="28" selection-start-line="16" selection-start-column="28" selection-end-line="16" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web3_connect.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
           <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/feeder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1216,24 +1180,83 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="18" column="37" selection-start-line="18" selection-start-column="37" selection-end-line="18" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/feeder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="63" column="50" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="50" />
           <folding>
-            <element signature="e#0#15#0" expanded="false" />
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schedule/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="387">
+          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+          <folding>
+            <marker date="1462814677654" expanded="true" signature="635:681" placeholder="..." />
+            <marker date="1462814677654" expanded="true" signature="851:912" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/device.config">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="8" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
+        <state relative-caret-position="315">
+          <caret line="21" column="9" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/zeroconf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dynamic_discovery.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="16" column="28" selection-start-line="16" selection-start-column="28" selection-end-line="16" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web3/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="25" column="21" selection-start-line="25" selection-start-column="21" selection-end-line="25" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web3/web3/methods/shh.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="31" column="28" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mine.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="132" column="0" selection-start-line="132" selection-start-column="0" selection-end-line="132" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ipaddr.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="107" column="0" selection-start-line="107" selection-start-column="0" selection-end-line="111" selection-end-column="38" />
+        <state relative-caret-position="194">
+          <caret line="68" column="30" selection-start-line="68" selection-start-column="30" selection-end-line="68" selection-end-column="30" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -1242,8 +1265,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/power_bartering.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="115" column="13" selection-start-line="115" selection-start-column="13" selection-end-line="115" selection-end-column="13" />
+        <state relative-caret-position="169">
+          <caret line="78" column="19" selection-start-line="78" selection-start-column="19" selection-end-line="78" selection-end-column="19" />
           <folding>
             <element signature="e#475#490#0" expanded="true" />
           </folding>
