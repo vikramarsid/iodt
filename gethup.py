@@ -231,5 +231,5 @@ class Gethup(object):
             print (self.accno)
             geth_command = self.givegeth(self.accno)
             # final_run = self.execute(geth_command, param="IPC service started")
-            final_run = self.execute(geth_command, param="IPC endpoint opened")
+            final_run = self.execute(geth_command, param="HTTP endpoint opened")
             print ("geth-----\n" + str(final_run["val"]))
