@@ -8,6 +8,7 @@
 # 6. Start polling for changes
 # 7. After receiving messages from all peers, flush the queue by shh_getMessage
 
+import operator
 import requests
 import subprocess
 import time
@@ -31,6 +32,7 @@ peer_shh_ids = []
 peer_contract_ids = []
 dict_req = {}
 dict_res = {}
+peer_priority = {}
 
 class PowerBartering:
     def __init__(self, mode):
@@ -39,8 +41,8 @@ class PowerBartering:
     @staticmethod
     def get_power_usage():
         command = "upower -i $(upower -e | grep BAT) | grep --color=never -E percentage|xargs|cut -d' ' -f2|sed s/%//"
-        get_batterydata = subprocess.Popen(["/bin/bash", "-c", command], stdout=subprocess.PIPE)
-        val = get_batterydata.communicate()[0].decode("utf-8").replace("\n", "")
+        get_battery_data = subprocess.Popen(["/bin/bash", "-c", command], stdout=subprocess.PIPE)
+        val = int(get_battery_data.communicate()[0].decode("utf-8").replace("\n", ""))
         return hex(val)
 
     def start_power_bartering(self):
@@ -73,6 +75,39 @@ class PowerBartering:
                     peer_contract_ids.append(device["contract_addr"])
                 print ("Peer Contract Addresses\n" + str(peer_contract_ids))
             return rest
+
+    @staticmethod
+    def get_peer_priority():
+        global sorted_priority
+        print("Getting Peer priority - " + str(time.time()))
+        # url = config.config_section_map("server")['url'] + 'iodt/peerinfo'
+        url = "http://www.mocky.io/v2/5734bf9c1300004d03cddfaf"
+        payload = {'device_id': config.config_section_map("device")['id']}
+        headers = {'Content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        if r.status_code == 200:
+            rest = json.loads(r.text)
+            peers = rest["Devices"]
+            # config.write_config("userprofile", "peercount", peers.__len__())
+            for device in peers:
+                peer_priority.update({device["shh_id"]: device["priority"]})
+            if peer_priority.__len__() > 0:
+                sorted_priority = sorted(peer_priority.items(), key=operator.itemgetter(1))
+                print (sorted_priority)
+            return sorted_priority
+
+    @staticmethod
+    def send_kill_signal(klist):
+        print("Sending kill signal - " + str(time.time()))
+        # url = config.config_section_map("server")['url'] + 'iodt/peerinfo'
+        url = "http://www.mocky.io/v2/5734bf9c1300004d03cddfaf"
+        payload = {'kill_list': klist}
+        headers = {'Content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        if r.status_code == 200:
+            # rest = json.loads(r.text)
+            return True
+        return False
 
     def broadcast_message(self):
         print("in broadcast message")
@@ -123,7 +158,8 @@ class PowerBartering:
     Message Receiving Functions
     '''
 
-    def get_filter_changes(self, faddr):
+    @staticmethod
+    def get_filter_changes(faddr):
         print("in get filter changes")
         mid = config.config_section_map("instance")["shh_id"]
         if mid == '':
@@ -134,7 +170,8 @@ class PowerBartering:
             return getf
         return False
 
-    def get_allMessages(self, faddr):
+    @staticmethod
+    def get_allmessages(faddr):
         print("in get all messages")
         mid = config.config_section_map("instance")["shh_id"]
         if mid == '':
@@ -220,19 +257,84 @@ class PowerBartering:
             else:
                 fail += 1
 
-        print ("\nTotal messages sent to peers: " + str(dict_req.keys().__len__()) + "\nTotal successful delivery : "
-               + str(success) + "\nTotal un-successful delivery: " + str(fail))
+        print (
+        "\nTotal messages sent to peers: " + str(dict_req.keys().__len__()) + "\nTotal successful delivery : " + str(
+            success) + "\nTotal un-successful delivery: " + str(fail))
 
         if success > 1:
             dict_req.clear()  # clearing the dictionary
-            self.get_allMessages(req_addr)  # clearing queue
+            self.get_allmessages(req_addr)  # clearing queue
             return "True"
         else:
             return "False"
 
-                # check = (topic == iodt_req_topic) & (origin is not mid)   # check to exclude self
-                # reply = self.post_message(iodt_res_topic, self.get_power_usage(), origin, mid)
-                # return reply
+    '''
+    In response to the power message
+    '''
+
+    def watch_response(self):
+        cost = 0
+        consumption = 0
+        kill_nodes = []
+        priority = self.get_peer_priority
+        if priority:
+            mid = config.config_section_map("instance")["shh_id"]
+            if mid == '':
+                mid = set_web3.set_identity()
+            res_addr = config.config_section_map("instance")["res_addr"]
+
+            if not res_addr:
+                res_addr = self.set_response_topic()
+            peer_count = config.config_section_map("userprofile")["peercount"]
+
+            timeout = time.time() + 60 * 5  # set time out for 5 minutes from now
+
+            while True:
+                res = self.get_filter_changes(res_addr)
+                if res:
+                    jres = json.loads(res)
+                    for i in range(jres["result"].__len__()):
+                        origin = jres["result"][i]["from"]
+                        res_payload = jres["result"][i]["payload"]
+                        dict_res.update({origin: int(res_payload, 0)})  # Updating the response dictonary
+
+                if dict_res.keys().__len__() == peer_count:
+                    break
+                else:
+                    print ("Waiting for peer power resuest")
+
+                if time.time() > timeout:
+                    break
+
+            if dict_res.keys().__len__() < peer_count:
+                print ("TIMEOUT:Missed messages from peers - please check power status of the peers")
+
+            limit = int(config.config_section_map("userprofile")['powerlimit'])
+
+            for values in dict_res.values():
+                consumption = consumption + values
+
+            if consumption > limit:
+                diff = consumption - limit
+
+                while cost <= diff:
+                    org = priority.pop()[0]
+                    if dict_res.has_key(org):
+                        cost = cost + dict_res.get(org)
+                    kill_nodes.append(org)
+
+                    if priority.__len__() == 1:
+                        break
+                print ("switching of nodes shown below:\n" + str(kill_nodes))
+                kill_all = self.send_kill_signal(kill_nodes)
+                if kill_all:
+                    dict_res.clear()  # clearing the dictionary
+                    self.get_allmessages(res_addr)  # clearing queue
+                    return "True"
+                else:
+                    print("Couldn't send kill message to all nodes")
+                    return "False"
+            return True
 
     '''
     Contract Execution
@@ -260,8 +362,6 @@ class PowerBartering:
             t2 = self.set_response_topic()
             if t2:
                 print ("Response topic set successful")
-
-
 
 
 if __name__ == '__main__':
