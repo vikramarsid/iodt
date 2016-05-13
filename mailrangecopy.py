@@ -9,7 +9,14 @@ from email import parser
 #from gmail import Gmail
 import time
 import imaplib
+from config_map import ConfigMap
 import time
+import ConfigParser
+Config = ConfigParser.ConfigParser()
+Config.read("device.config")
+cfgfile = open("device.config", 'r')
+email = Config.get("userprofile", "email")
+print email
 GPIO.setmode(GPIO.BCM)
 
 TRIG = 20 
@@ -34,7 +41,8 @@ smtp_host = 'smtp.gmail.com'
 login = 'iodt2016@gmail.com'
 password = 'project2016'
 
-recipients_emails = ['akilesh.mani@sjsu.edu', 'iakki1390@gmail.com', 'vikramsai.arsid@sjsu.edu']
+recipients_emails = ['"%s"' % email]
+print recipients_emails
 
 
 print "Calculating the level"
