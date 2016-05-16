@@ -1,10 +1,11 @@
-import time
-import subprocess
 import os
+import subprocess
+import time
 
+from dynamic_discovery import ServiceListener
 from gethup import Gethup
 from zeroconf import *
-from dynamic_discovery import ServiceListener
+
 current_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -12,8 +13,8 @@ class DynamicDiscoveryDriver(object):
 
     def scan(self):
         browser = ServiceBrowser(Zeroconf(), "_http._tcp.local.", ServiceListener())
-        print ("Searching for devices for 40 seconds...")
-        time.sleep(40)
+        print ("Searching for devices for 10 seconds...")
+        time.sleep(10)
         Zeroconf().close()
 
 
@@ -29,14 +30,7 @@ class DynamicDiscoveryDriver(object):
 
 
 if __name__ == '__main__':
-
-    #scanner = DynamicDiscoveryDriver()
-    #connector = HostConnect()
-    #scanner.start_blockchain_server()
-    #scanner.scan()
-    #server = connector.connect()
-    #print (server.getinfo())
-    #print current_path
-
+    scanner = DynamicDiscoveryDriver()
+    scanner.scan()
     startup = Gethup()
     startup.startnode()
