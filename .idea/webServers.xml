@@ -2,16 +2,16 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="30ae6f57-fdca-4621-9753-7ba1a9ca9368" name="rp1" url="http://192.168.29.248">
-        <fileTransfer host="192.168.29.248" port="22" accessType="SFTP" password="dfd8dfcbdfd9dfdadfc8dfcfdfd8dfd8dfd3" username="pi">
+      <webServer id="30ae6f57-fdca-4621-9753-7ba1a9ca9368" name="rp1" url="http://192.168.43.11">
+        <fileTransfer host="192.168.43.11" port="22" accessType="SFTP" password="dfd8dfcbdfd9dfdadfc8dfcfdfd8dfd8dfd3" username="pi">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="c9a1d9cc-884a-4c50-b3a2-0e8277953806" name="rp2" url="http://192.168.29.104">
-        <fileTransfer host="192.168.29.104" port="22" accessType="SFTP" password="dfd8dfcbdfd9dfdadfc8dfcfdfd8dfd8dfd3" username="pi">
+      <webServer id="c9a1d9cc-884a-4c50-b3a2-0e8277953806" name="rp2" url="http://192.168.43.85">
+        <fileTransfer host="192.168.43.85" port="22" accessType="SFTP" password="dfd8dfcbdfd9dfdadfc8dfcfdfd8dfd8dfd3" username="pi">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>

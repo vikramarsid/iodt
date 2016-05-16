@@ -10,19 +10,21 @@
 
 import operator
 import requests
-import subprocess
 import time
+from multiprocessing import Process
 
 from flask import json
 
 import schedule
 import web3_connect
 from config_map import ConfigMap
+from utility import Utility
 
 config = ConfigMap()
 set_web3 = web3_connect.Web3Connect()
 web3 = set_web3.connect()
 cc = set_web3.connect_contract()
+util = Utility()
 
 # topics
 iodt_req_topic = "0x696f64745f706f7765725f626172746572696e67"
@@ -37,24 +39,29 @@ peer_priority = {}
 class PowerBartering:
     def __init__(self, mode):
         self.mode = mode
-
-    @staticmethod
-    def get_power_usage():
-        command = "upower -i $(upower -e | grep BAT) | grep --color=never -E percentage|xargs|cut -d' ' -f2|sed s/%//"
-        get_battery_data = subprocess.Popen(["/bin/bash", "-c", command], stdout=subprocess.PIPE)
-        val = int(get_battery_data.communicate()[0].decode("utf-8").replace("\n", ""))
-        return hex(val)
+        self.interval = 1000
+        req_filter = config.config_section_map("instance")["req_addr"]
+        res_filter = config.config_section_map("instance")["res_addr"]
+        if not (req_filter and res_filter):
+            self.start_topics()
+        p1 = Process(target=self.watch_request)
+        p1.start()
+        p2 = Process(target=self.watch_response)
+        p2.start()
+        pass
 
     def start_power_bartering(self):
-        schedule.every(1).minutes.do(self.get_peer_usage("shh"))
+        self.get_peer_usage("shh")
+        # schedule.every(1).minutes.do(self.get_peer_usage("shh"))
+        schedule.every(1).hours.do(self.get_peer_usage, "shh")
         # schedule.every(1).hour.do(self.get_peer_usage("shh"))
         while True:
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(3540)
 
     def get_peer_usage(self, stype):
         print("Getting Peer details - " + str(time.time()))
-        # url = config.config_section_map("server")['url'] + 'iodt/peerinfo'
+        #url = config.config_section_map("server")['url'] + 'iodt/peerinfo'
         url = "http://www.mocky.io/v2/5730e1fd100000ad0717f882"
         payload = {'device_id': config.config_section_map("device")['id']}
         headers = {'Content-type': 'application/json'}
@@ -80,7 +87,7 @@ class PowerBartering:
     def get_peer_priority():
         global sorted_priority
         print("Getting Peer priority - " + str(time.time()))
-        # url = config.config_section_map("server")['url'] + 'iodt/peerinfo'
+        #url = config.config_section_map("server")['url'] + 'iodt/peerinfo'
         url = "http://www.mocky.io/v2/5734bf9c1300004d03cddfaf"
         payload = {'device_id': config.config_section_map("device")['id']}
         headers = {'Content-type': 'application/json'}
@@ -113,7 +120,6 @@ class PowerBartering:
         print("in broadcast message")
         success = 0
         fail = 0
-        # TODO Call watch_request
         peers = peer_shh_ids.__len__()
         mid = config.config_section_map("instance")["shh_id"]
         if mid == '':
@@ -210,6 +216,15 @@ class PowerBartering:
             return setf
         return False
 
+    def start_topics(self):
+        print ("Setting Filters")
+        t1 = self.set_request_topic()
+        if t1:
+            print ("Request topic set successful")
+            t2 = self.set_response_topic()
+            if t2:
+                print ("Response topic set successful")
+
     '''
     Reply to the message
     '''
@@ -226,16 +241,15 @@ class PowerBartering:
             req_addr = self.set_request_topic()
         peer_count = config.config_section_map("userprofile")["peercount"]
 
-        timeout = time.time() + 60 * 5  # set time out for 5 minutes from now
+        timeout = time.time() + 60 * 2  # set time out for 5 minutes from now
 
         while True:
             req = self.get_filter_changes(req_addr)
             if req:
-                jreq = json.loads(req)
-                for i in range(jreq["result"].__len__()):
-                    origin = jreq["result"][i]["from"]
-                    sent = jreq["result"][i]["sent"]
-                    req_payload = jreq["result"][i]["payload"]
+                for i in range(req.__len__()):
+                    origin = req[i]["from"]
+                    sent = req[i]["sent"]
+                    req_payload = req[i]["payload"]
                     if req_payload == power_usage_payload:
                         dict_req.update({origin: sent})
 
@@ -246,12 +260,13 @@ class PowerBartering:
 
             if time.time() > timeout:
                 break
+
         if dict_req.keys().__len__() < peer_count:
             print ("TIMEOUT:Missed messages from peers - please check power status of the peers")
-        current_usage = self.get_power_usage()
+        current_usage = util.get_power_usage()
 
         for key in dict_req.keys():
-            send_res = self.post_message(iodt_res_topic, current_usage, key, mid)  # Sending power usage reply
+            send_res = self.post_message(iodt_res_topic, hex(current_usage), key, mid)  # Sending power usage reply
             if send_res:
                 success += 1
             else:
@@ -287,15 +302,14 @@ class PowerBartering:
                 res_addr = self.set_response_topic()
             peer_count = config.config_section_map("userprofile")["peercount"]
 
-            timeout = time.time() + 60 * 5  # set time out for 5 minutes from now
+            timeout = time.time() + 60 * 2  # set time out for 5 minutes from now
 
             while True:
                 res = self.get_filter_changes(res_addr)
                 if res:
-                    jres = json.loads(res)
-                    for i in range(jres["result"].__len__()):
-                        origin = jres["result"][i]["from"]
-                        res_payload = jres["result"][i]["payload"]
+                    for i in range(res.__len__()):
+                        origin = res[i]["from"]
+                        res_payload = res[i]["payload"]
                         dict_res.update({origin: int(res_payload, 0)})  # Updating the response dictonary
 
                 if dict_res.keys().__len__() == peer_count:
@@ -350,23 +364,9 @@ class PowerBartering:
             print(err)
             return []
 
-    '''
-    Main Worker function
-    '''
-
-    def live(self):
-        print ("Setting Filters")
-        t1 = self.set_request_topic()
-        if t1:
-            print ("Request topic set successful")
-            t2 = self.set_response_topic()
-            if t2:
-                print ("Response topic set successful")
-
-
 if __name__ == '__main__':
     pb = PowerBartering("active")
-    print(pb.get_power_usage())
+    print(pb.start_power_bartering())
     # print(pb.limit_check())
     # print(pb.set_filter())
     # print(pb.get_filter_changes())

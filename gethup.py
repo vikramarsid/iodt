@@ -3,7 +3,6 @@ import errno
 import os
 import re
 import requests
-import socket
 import subprocess
 import time
 from multiprocessing.pool import ThreadPool
@@ -15,8 +14,10 @@ from flask import json
 import web3_connect
 from config_map import ConfigMap
 from feeder import Feeder
-from power_bartering import PowerBartering
+from utility import Utility
 
+# from power_bartering import PowerBartering
+util = Utility()
 config = ConfigMap()
 pool = ThreadPool(processes=1)
 set_web3 = web3_connect.Web3Connect()
@@ -28,14 +29,14 @@ class Gethup(object):
     device_id = config.config_section_map("device")['id']
     device_name = config.config_section_map("device")['name']
     instance_id = config.config_section_map("instance")['id']
-    server_url = config.config_section_map("server")['url'] + 'devices'
+    server_url = config.config_section_map("server")['url']  # + 'devices'
     shh_id = config.config_section_map("instance")['shh_id']
     network_id = config.config_section_map("instance")['network_id']
     port = config.config_section_map("instance")['port']
     c_addr = config.config_section_map("instance")['contract_address']
     status = config.config_section_map("device")['status']
     directory = expanduser("~") + "/iodt-node"
-    device_power_level = PowerBartering(status).get_power_usage()
+    device_power_level = util.get_power_usage()
 
     # geth CLI params
     datetag = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
@@ -45,21 +46,13 @@ class Gethup(object):
     stablelog = directory + '/log/' + instance_id + '.log'
     keystore = directory + '/keystore/' + instance_id
     password = instance_id
-    rpcport = '82' + instance_id
+    rpcport = '8203'
     enodeid = ''
     accno = ''
 
-    @staticmethod
-    def get_ip_address():
-        gw = os.popen("ip -4 route show default").read().split()
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect((gw[2], 0))
-        ipaddr = s.getsockname()[0]
-        return ipaddr
-
     def ext_curl(self):
         url = self.server_url
-        payload = {'enode': self.enodeid, 'host': self.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
+        payload = {'enode': self.enodeid, 'host': util.get_ip_address(), 'rpcport': self.rpcport, 'port': self.port,
                    'device_id': self.device_id, 'account': self.accno, 'name': self.device_name, 'status': self.status,
                    'network_id': self.network_id, 'shh_id': self.shh_id, 'contract_addr': self.c_addr,
                    'power_usage': self.device_power_level,

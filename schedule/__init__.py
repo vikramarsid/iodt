@@ -37,10 +37,13 @@ Usage:
 import datetime
 import functools
 import logging
-import threading
 import time
 
 logger = logging.getLogger('schedule')
+
+
+class CancelJob(object):
+    pass
 
 
 class Scheduler(object):
@@ -58,33 +61,7 @@ class Scheduler(object):
         """
         runnable_jobs = (job for job in self.jobs if job.should_run)
         for job in sorted(runnable_jobs):
-            job.run()
-
-    def run_continuously(self, interval=1):
-        """Continuously run, while executing pending jobs at each elapsed
-        time interval.
-
-        @return cease_continuous_run: threading.Event which can be set to
-        cease continuous run.
-
-        Please note that it is *intended behavior that run_continuously()
-        does not run missed jobs*. For example, if you've registered a job
-        that should run every minute and you set a continuous run interval
-        of one hour then your job won't be run 60 times at each interval but
-        only once.
-        """
-        cease_continuous_run = threading.Event()
-
-        class ScheduleThread(threading.Thread):
-            @classmethod
-            def run(cls):
-                while not cease_continuous_run.is_set():
-                    self.run_pending()
-                    time.sleep(interval)
-
-        continuous_thread = ScheduleThread()
-        continuous_thread.start()
-        return cease_continuous_run
+            self._run_job(job)
 
     def run_all(self, delay_seconds=0):
         """Run all jobs regardless if they are scheduled to run or not.
@@ -95,12 +72,19 @@ class Scheduler(object):
         logger.info('Running *all* %i jobs with %is delay inbetween',
                     len(self.jobs), delay_seconds)
         for job in self.jobs:
-            job.run()
+            self._run_job(job)
             time.sleep(delay_seconds)
 
     def clear(self):
         """Deletes all scheduled jobs."""
         del self.jobs[:]
+
+    def cancel_job(self, job):
+        """Delete a scheduled job."""
+        try:
+            self.jobs.remove(job)
+        except ValueError:
+            pass
 
     def every(self, interval=1):
         """Schedule a new periodic job."""
@@ -108,9 +92,16 @@ class Scheduler(object):
         self.jobs.append(job)
         return job
 
+    def _run_job(self, job):
+        ret = job.run()
+        if isinstance(ret, CancelJob) or ret is CancelJob:
+            self.cancel_job(job)
+
     @property
     def next_run(self):
         """Datetime when the next job should run."""
+        if not self.jobs:
+            return None
         return min(self.jobs).next_run
 
     @property
@@ -121,7 +112,6 @@ class Scheduler(object):
 
 class Job(object):
     """A periodic job as used by `Scheduler`."""
-
     def __init__(self, interval):
         self.interval = interval  # pause interval * unit between runs
         self.job_func = None  # the job job_func to run
@@ -130,6 +120,7 @@ class Job(object):
         self.last_run = None  # datetime of the last run
         self.next_run = None  # datetime of the next run
         self.period = None  # timedelta between runs, only valid for
+        self.start_day = None  # Specific day of the week to start on
 
     def __lt__(self, other):
         """PeriodicJobs are sortable based on the scheduled time
@@ -138,12 +129,15 @@ class Job(object):
 
     def __repr__(self):
         def format_time(t):
-            return t.strftime("%Y-%m-%d %H:%M:%S") if t else '[never]'
+            return t.strftime('%Y-%m-%d %H:%M:%S') if t else '[never]'
 
         timestats = '(last run: %s, next run: %s)' % (
             format_time(self.last_run), format_time(self.next_run))
 
-        job_func_name = self.job_func.__name__
+        if hasattr(self.job_func, '__name__'):
+            job_func_name = self.job_func.__name__
+        else:
+            job_func_name = repr(self.job_func)
         args = [repr(x) for x in self.job_func.args]
         kwargs = ['%s=%s' % (k, repr(v))
                   for k, v in self.job_func.keywords.items()]
@@ -206,6 +200,48 @@ class Job(object):
         return self.weeks
 
     @property
+    def monday(self):
+        assert self.interval == 1
+        self.start_day = 'monday'
+        return self.weeks
+
+    @property
+    def tuesday(self):
+        assert self.interval == 1
+        self.start_day = 'tuesday'
+        return self.weeks
+
+    @property
+    def wednesday(self):
+        assert self.interval == 1
+        self.start_day = 'wednesday'
+        return self.weeks
+
+    @property
+    def thursday(self):
+        assert self.interval == 1
+        self.start_day = 'thursday'
+        return self.weeks
+
+    @property
+    def friday(self):
+        assert self.interval == 1
+        self.start_day = 'friday'
+        return self.weeks
+
+    @property
+    def saturday(self):
+        assert self.interval == 1
+        self.start_day = 'saturday'
+        return self.weeks
+
+    @property
+    def sunday(self):
+        assert self.interval == 1
+        self.start_day = 'sunday'
+        return self.weeks
+
+    @property
     def weeks(self):
         self.unit = 'weeks'
         return self
@@ -216,9 +252,14 @@ class Job(object):
         Calling this is only valid for jobs scheduled to run every
         N day(s).
         """
-        assert self.unit == 'days'
-        hour, minute = [int(t) for t in time_str.split(':')]
-        assert 0 <= hour <= 23
+        assert self.unit in ('days', 'hours') or self.start_day
+        hour, minute = [t for t in time_str.split(':')]
+        minute = int(minute)
+        if self.unit == 'days' or self.start_day:
+            hour = int(hour)
+            assert 0 <= hour <= 23
+        elif self.unit == 'hours':
+            hour = 0
         assert 0 <= minute <= 59
         self.at_time = datetime.time(hour, minute)
         return self
@@ -231,7 +272,13 @@ class Job(object):
         the job runs.
         """
         self.job_func = functools.partial(job_func, *args, **kwargs)
-        functools.update_wrapper(self.job_func, job_func)
+        try:
+            functools.update_wrapper(self.job_func, job_func)
+        except AttributeError:
+            # job_funcs already wrapped by functools.partial won't have
+            # __name__, __module__ or __doc__ and the update_wrapper()
+            # call will fail.
+            pass
         self._schedule_next_run()
         return self
 
@@ -243,9 +290,10 @@ class Job(object):
     def run(self):
         """Run the job and immediately reschedule it."""
         logger.info('Running job %s', self)
-        self.job_func()
+        ret = self.job_func()
         self.last_run = datetime.datetime.now()
         self._schedule_next_run()
+        return ret
 
     def _schedule_next_run(self):
         """Compute the instant when this job should run next."""
@@ -254,18 +302,46 @@ class Job(object):
         assert self.unit in ('seconds', 'minutes', 'hours', 'days', 'weeks')
         self.period = datetime.timedelta(**{self.unit: self.interval})
         self.next_run = datetime.datetime.now() + self.period
-        if self.at_time:
-            assert self.unit == 'days'
-            self.next_run = self.next_run.replace(hour=self.at_time.hour,
-                                                  minute=self.at_time.minute,
-                                                  second=self.at_time.second,
-                                                  microsecond=0)
+        if self.start_day is not None:
+            assert self.unit == 'weeks'
+            weekdays = (
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday',
+                'sunday'
+            )
+            assert self.start_day in weekdays
+            weekday = weekdays.index(self.start_day)
+            days_ahead = weekday - self.next_run.weekday()
+            if days_ahead <= 0:  # Target day already happened this week
+                days_ahead += 7
+            self.next_run += datetime.timedelta(days_ahead) - self.period
+        if self.at_time is not None:
+            assert self.unit in ('days', 'hours') or self.start_day is not None
+            kwargs = {
+                'minute': self.at_time.minute,
+                'second': self.at_time.second,
+                'microsecond': 0
+            }
+            if self.unit == 'days' or self.start_day is not None:
+                kwargs['hour'] = self.at_time.hour
+            self.next_run = self.next_run.replace(**kwargs)
             # If we are running for the first time, make sure we run
-            # at the specified time *today* as well
-            if (not self.last_run and
-                        self.at_time > datetime.datetime.now().time()):
-                self.next_run = self.next_run - datetime.timedelta(days=1)
-
+            # at the specified time *today* (or *this hour*) as well
+            if not self.last_run:
+                now = datetime.datetime.now()
+                if (self.unit == 'days' and self.at_time > now.time() and
+                            self.interval == 1):
+                    self.next_run = self.next_run - datetime.timedelta(days=1)
+                elif self.unit == 'hours' and self.at_time.minute > now.minute:
+                    self.next_run = self.next_run - datetime.timedelta(hours=1)
+        if self.start_day is not None and self.at_time is not None:
+            # Let's see if we will still make that time we specified today
+            if (self.next_run - datetime.datetime.now()).days >= 7:
+                self.next_run -= self.period
 
 # The following methods are shortcuts for not having to
 # create a Scheduler instance:
@@ -277,22 +353,6 @@ jobs = default_scheduler.jobs  # todo: should this be a copy, e.g. jobs()?
 def every(interval=1):
     """Schedule a new periodic job."""
     return default_scheduler.every(interval)
-
-
-def run_continuously(interval=1):
-    """Continuously run, while executing pending jobs at each elapsed
-    time interval.
-
-    @return cease_continuous_run: threading.Event which can be set to
-    cease continuous run.
-
-    Please note that it is *intended behavior that run_continuously()
-    does not run missed jobs*. For example, if you've registered a job
-    that should run every minute and you set a continuous run interval
-    of one hour then your job won't be run 60 times at each interval but
-    only once.
-    """
-    return default_scheduler.run_continuously(interval)
 
 
 def run_pending():
@@ -319,6 +379,11 @@ def run_all(delay_seconds=0):
 def clear():
     """Deletes all scheduled jobs."""
     default_scheduler.clear()
+
+
+def cancel_job(job):
+    """Delete a scheduled job."""
+    default_scheduler.cancel_job(job)
 
 
 def next_run():

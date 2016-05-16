@@ -8,9 +8,12 @@ from flask import json
 
 import schedule
 from config_map import ConfigMap
-from power_bartering import PowerBartering
+from utility import Utility
+
+# from power_bartering import PowerBartering
 from web3_connect import Web3Connect
 
+util = Utility()
 config = ConfigMap()
 set_web3 = Web3Connect()
 device_id = config.config_section_map("device")['id']
@@ -23,7 +26,7 @@ port = config.config_section_map("instance")['port']
 c_addr = config.config_section_map("instance")['contract_address']
 status = config.config_section_map("device")['status']
 directory = expanduser("~") + "/iodt-node"
-device_power_level = PowerBartering(status).get_power_usage()
+device_power_level = util.get_power_usage()
 rpcport = '82' + instance_id
 enode = config.config_section_map("instance")['enode']
 accno = config.config_section_map("instance")['account']
