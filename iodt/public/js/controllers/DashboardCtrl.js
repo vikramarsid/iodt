@@ -29,4 +29,32 @@ angular.module('DashboardCtrl', []).controller('DashboardCtrl', function($scope,
 	});
 
 
+	$http.get('/api/iodt/powerusage')
+	.success(function(response) {
+		var x = ['x'];
+		var xdata = ['Power Usage'];
+		for (var i = 0; i < response.length; i++) {
+			x.push(new Date(response[i]["DATE"] + " " + response[i]["START TIME"]));
+			xdata.push(response[i]["USAGE"]);
+		};
+		var chart = c3.generate({
+			bindto: '#chart',
+			data: {
+				x: 'x',
+				columns: [
+					x, xdata,
+				],
+			},
+			axis: {
+				x: {
+					type: 'timeseries',
+					tick: {
+						format: '%m/%d/%Y',
+					}
+				}
+			}
+		});
+	});
+
+
 });

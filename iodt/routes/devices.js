@@ -178,8 +178,8 @@ router.post('/', function(req, res) {
 			return this.res.json({"Error" : true, "Message" : err});
 		} else if(rows.length > 0) {
 
-			var query = "UPDATE devices SET enode = ?, host = ?, port = ?, rpcport = ?, account = ?, contract_addr = ?, network_id = ?, shh_id = ?, power_usage = ?, updated_at = NOW() WHERE  device_id = ?";
-			var values = [this.req.body.enode, this.req.body.host, this.req.body.port, this.req.body.rpcport, this.req.body.account, this.req.body.contract_addr, this.req.body.network_id, this.req.body.shh_id, this.req.body.power_usage, this.req.body.device_id];
+			var query = "UPDATE devices SET enode = ?, host = ?, port = ?, rpcport = ?, account = ?, contract_addr = ?, network_id = ?, shh_id = ?, power_usage = ?, status = ?, updated_at = NOW() WHERE  device_id = ?";
+			var values = [this.req.body.enode, this.req.body.host, this.req.body.port, this.req.body.rpcport, this.req.body.account, this.req.body.contract_addr, this.req.body.network_id, this.req.body.shh_id, this.req.body.power_usage, this.req.body.status, this.req.body.device_id];
 			query = mysql.format(query, values);
 			mySQLHelper.executeSQLQuery(query, (function(err, rows) {
 

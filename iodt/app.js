@@ -3,6 +3,7 @@ var express = require('express');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var mysql = require("mysql");
 
 var config = require('./config');
 var mySQLHelper = require('./helper/mySQLHelper');
@@ -11,6 +12,7 @@ var users = require('./routes/users');
 var clusters = require('./routes/clusters');
 var devices = require('./routes/devices');
 var iodt = require('./routes/iodt');
+
 
 var app = express();
 var port = config.app.port || 7000;
@@ -27,6 +29,10 @@ app.use('/api/users', users);
 app.use('/api/clusters', clusters);
 app.use('/api/devices', devices);
 app.use('/api/iodt', iodt);
+
+setInterval(function() {
+	updateStatusOfDevices();
+}, 360000);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -60,6 +66,19 @@ app.use(function(err, req, res, next) {
 	});
 	return;
 });
+
+function updateStatusOfDevices() {
+	var query = "UPDATE devices SET status = 'inactive', updated_at= NOW() WHERE NOT DATE_SUB(NOW(), INTERVAL 1 HOUR) < updated_at";
+	var values = [];
+
+	query = mysql.format(query, values);
+
+	mySQLHelper.executeSQLQuery(query, function(err, rows) {
+		if(err) {
+			console.log(err);
+		}
+	});
+}
 
 app.listen(port);
 console.log('IoDT Application Running on port: ' + port);

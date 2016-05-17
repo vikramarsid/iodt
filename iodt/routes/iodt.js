@@ -7,6 +7,16 @@ var mySQLHelper = require('../helper/mySQLHelper');
 var web3Helper = require('../helper/web3Helper');
 var stringUtils = require('../helper/stringUtils');
 
+var fs = require("fs");
+var Converter = require("csvtojson").Converter;
+var converter = new Converter({});
+var csvFileName = "./pge.csv";
+var pgeJson;
+converter.on("end_parsed",function(jsonObj) {
+	pgeJson = jsonObj;
+});
+fs.createReadStream(csvFileName).pipe(converter);
+
 
 /* GET all unassigned devices listing */
 router.get('/availableDevices', function(req, res) {
@@ -242,6 +252,14 @@ router.post('/peerinfo', function(req, res) {
 		}
 
 	}).bind(params));
+
+});
+
+
+/* GET power usage */
+router.get('/powerusage', function(req, res) {
+
+	res.json(pgeJson);
 
 });
 
